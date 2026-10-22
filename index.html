@@ -51,7 +51,7 @@ const m=n=>n.toLocaleString("sv-SE")+" kr", clamp=(v,a,b)=>Math.max(a,Math.min(b
 function bar(v){return `<div class="bar"><i style="width:${clamp(v,0,100)}%"></i></div>`}
 function navR(){let a=[["garage","Garage"],["calendar","Kalender"],["drivers","Förare"],["championship","Mästerskap"],["economy","Ekonomi"],["stats","Statistik"],["world","Racingvärlden"]];nav.innerHTML=a.map(x=>`<button class="${tab==x[0]?'active':''}" onclick="tab='${x[0]}';render()">${x[1]}</button>`).join("")}
 function render(){date.textContent=s.started?`${s.season||2027} • ${s.event<4?CAL[s.event][0]:"Säsongen klar"}`:"Ny karriär";if(!s.started){nav.innerHTML="";return start()}navR();({garage,calendar:cal,drivers:driverPage,championship:champ,economy:econ,stats:statsPage,world:worldPage,week:weekPage,raceWeekend})[tab]?.();save()}
-function start(){main.innerHTML=`<section class="hero"><span class="badge red">v0.9 • RACINGVÄRLDEN</span><h1 style="margin-top:12px">MX-5 Cup Manager</h1><p>Nu med en levande racingvärld: rivaliteter, depånyheter, AI-form, marknad, vinterbeslut och fler konsekvenser mellan tävlingarna.</p></section><div class="grid"><div class="card span6"><h2>Din förare</h2><input id="pn" value="Jakob"><br><br><input id="tn" value="Jakob Racing"></div><div class="card span6"><h2>Välj klass</h2><div class="choice"><button onclick="begin('Standard')"><strong>Standard Cup</strong><span class="muted">Den naturliga vägen in.</span></button><button onclick="begin('Modified')"><strong>Modified Cup</strong><span class="muted">Snabbare och dyrare.</span></button></div></div></div>`}
+function start(){main.innerHTML=`<section class="hero"><span class="badge red">v1.03 • RACINGVÄRLDEN</span><h1 style="margin-top:12px">MX-5 Cup Manager</h1><p>Nu med en levande racingvärld: rivaliteter, depånyheter, AI-form, marknad, vinterbeslut och fler konsekvenser mellan tävlingarna.</p></section><div class="grid"><div class="card span6"><h2>Din förare</h2><input id="pn" value="Jakob"><br><br><input id="tn" value="Jakob Racing"></div><div class="card span6"><h2>Välj klass</h2><div class="choice"><button onclick="begin('Standard')"><strong>Standard Cup</strong><span class="muted">Den naturliga vägen in.</span></button><button onclick="begin('Modified')"><strong>Modified Cup</strong><span class="muted">Snabbare och dyrare.</span></button></div></div></div>`}
 function begin(c){s=fresh();s.started=true;s.name=pn.value||"Jakob";s.team=tn.value||"Jakob Racing";s.cls=c;if(c==="Modified"){s.cash=210000;s.driver=70;s.car.motor=88;s.car.chassis=88}s.log.unshift("Satsningen är igång.");tab="garage";render()}
 function cp(n){return s.champ[s.cls][n]||0}
 function garage(){let ev=CAL[s.event],ready=s.membership&&s.license&&s.safety;
@@ -104,7 +104,7 @@ function worldPage(){let rivals=Object.entries(s.rivals).sort((a,b)=>b[1]-a[1]).
 function winterChoice(c){if(c==='modified'){let cost=65000;if(s.cash<cost)return alert('Du behöver 65 000 kr i racingbudgeten för att bygga om/ta steget till Modified.');s.cash-=cost;s.stats.costs+=cost;s.cls='Modified';s.car.motor=Math.max(s.car.motor,88);s.car.chassis=Math.max(s.car.chassis,88);s.log.unshift('Stort beslut: teamet tar steget till Modified Cup.')}else{s.car.condition=clamp(s.car.condition+5,0,100);s.log.unshift(`Du fortsätter i ${s.cls} och bygger vidare på det du har.`)}newSeason()}
 function newSeason(){s.season++;s.event=0;s.week=0;s.champ={Standard:{},Modified:{}};s.entered=false;s.activities=3;s.history=[];s.stats.starts=0;s.stats.wins=0;s.stats.podiums=0;s.stats.poles=0;s.stats.dnf=0;s.stats.best=99;s.stats.modifiedBeaten=0;s.stats.incidents=0;s.news.unshift(`Säsongen ${s.season} är igång. Nya förväntningar i depån.`);tab="garage";render()}
 
-// ---- v0.9 race depth / migration ----
+// ---- v1.03 race depth / migration ----
 function migrateV5(){
   s.v5=s.v5||{};
   s.v5.news=s.v5.news||[];
@@ -228,14 +228,14 @@ function racingWorldV5(){
   let topS=Object.entries(s.champ.Standard||{}).sort((a,b)=>b[1]-a[1]).slice(0,3),topM=Object.entries(s.champ.Modified||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);
   main.innerHTML=`<section class="hero"><span class="badge red">RACINGVÄRLDEN</span><h1>Runt MX-5 Cup</h1><p>Resultat, depåsnack, rivaler och berättelser från säsongen.</p></section><div class="grid"><div class="card span6"><h2>Senaste nytt</h2><div class="newsgrid">${(s.v5.news.length?s.v5.news:["Säsongen laddar upp. Alla blickar är på nästa tävlingshelg.","Standard och Modified delar asfalt – men inte mästerskap."]).slice(0,6).map(n=>`<div class="event">${n}</div>`).join("")}</div></div><div class="card span6"><h2>Din berättelse</h2><div class="row"><span>Racebeslut</span><b>${s.v5.decisions}</b></div><div class="row"><span>Straff</span><b>${s.v5.penalties}</b></div><div class="row"><span>Snabbaste varv</span><b>${s.v5.fastest}</b></div><div class="row"><span>Incidenter</span><b>${s.stats.incidents}</b></div></div><div class="card span6"><h2>Standard topp 3</h2>${topS.length?topS.map((x,i)=>`<div class="row"><span>${i+1}. ${x[0]}</span><b>${x[1]}</b></div>`).join(""):"<p class='muted'>Inga race körda ännu.</p>"}</div><div class="card span6"><h2>Modified topp 3</h2>${topM.length?topM.map((x,i)=>`<div class="row"><span>${i+1}. ${x[0]}</span><b>${x[1]}</b></div>`).join(""):"<p class='muted'>Inga race körda ännu.</p>"}</div></div>`;
 }
-// Hook v0.9 into existing game without breaking old saves.
+// Hook v1.03 into existing game without breaking old saves.
 const _oldNavR=navR; navR=function(){_oldNavR();nav.innerHTML+=`<button class="${tab==='world'?'active':''}" onclick="tab='world';racingWorldV5()">Racingvärlden</button>`}
 const _oldRender=render; render=function(){migrateV5();if(tab==="world"){date.textContent=`${s.season||2027} • Racingvärlden`;navR();racingWorldV5();save();return}_oldRender()}
 const _oldStartRace=startRace; startRace=function(risk){makeLiveV5(risk)}
 const _oldLiveView=liveView; liveView=function(){liveViewV5()}
 
 
-// ---- v0.9: clearer class gap + tactical race decisions ----
+// ---- v1.03: clearer class gap + tactical race decisions ----
 function raceStrategyBox(){
   if(!live||live.finished)return "";
   let me=live.field.find(x=>x.you); if(!me||me.dnf)return "";
@@ -292,7 +292,7 @@ liveViewV5=liveViewV6;
 liveView=liveViewV6;
 
 
-// ---- v0.9: tyre selection, meaningful practice/setup, rotating calendars ----
+// ---- v1.03: tyre selection, meaningful practice/setup, rotating calendars ----
 const TRACK_POOL=[
 ["Anderstorp","Snabb • stabilitet viktig",16,{bal:52,press:49,key:"stabilitet"}],
 ["Rudskogen","Flyt • mod belönas",15,{bal:50,press:51,key:"flyt"}],
@@ -315,12 +315,12 @@ function tyreSelector(){
 function selectTyre(i){s.v7.activeTyre=i;s.log.unshift(`Däckset ${String.fromCharCode(65+i)} monterat.`);render()}
 function trackData(){let name=currentCal()[s.event]?.[0];return TRACK_POOL.find(x=>x[0]===name)||TRACK_POOL[0]}
 function setupScore(){
- let t=trackData()[4], knowledge=s.v7.knowledge||0;
+ let t=trackData()[3], knowledge=s.v7.knowledge||0;
  let db=Math.abs(s.setup.balance-t.bal),dp=Math.abs(s.setup.pressure-t.press);
  return clamp(100-db*8-dp*7+knowledge*.12,0,100);
 }
 function setupFeedback(){
- let t=trackData()[4],k=s.v7.knowledge;
+ let t=trackData()[3],k=s.v7.knowledge;
  if(k<20)return "Bilen känns okej, men du har för lite data för att säga vad som behöver ändras.";
  let bits=[];
  let bd=s.setup.balance-t.bal,pd=s.setup.pressure-t.press;
@@ -355,9 +355,9 @@ function practiceV7(){
 }
 function generateCalendarV7(season){
  let mandatory=season===2027?TRACK_POOL.slice(0,4):[];
- if(mandatory.length)return mandatory.map((t,i)=>[t[0],["1–3 maj","12–14 juni","3–5 juli","28–30 augusti"][i],t[1],t[2],t[4]]);
+ if(mandatory.length)return mandatory.map((t,i)=>[t[0],["1–3 maj","12–14 juni","3–5 juli","28–30 augusti"][i],t[1],t[2],t[3]]);
  let pool=[...TRACK_POOL].sort(()=>Math.random()-.5),count=Math.random()<.35?3:4,dates=["8–10 maj","12–14 juni","10–12 juli","28–30 augusti"];
- return pool.slice(0,count).map((t,i)=>[t[0],dates[i],t[1],t[2],t[4]]);
+ return pool.slice(0,count).map((t,i)=>[t[0],dates[i],t[1],t[2],t[3]]);
 }
 function calendarV7(){
  let c=currentCal();
@@ -367,7 +367,7 @@ ensureV7();
 // Make setup matter in performance: max ~4 points; bad blind setup can cost pace.
 const _paceV7=pace; pace=function(x,spread=8){let p=_paceV7(x,spread);if(x.you)p+=(setupScore()-70)*.055;return p}
 const _raceBaseV7=raceBase; raceBase=function(x){let p=_raceBaseV7(x);if(x.you)p+=(setupScore()-70)*.05;return p}
-// Route practice/calendar to v0.9.
+// Route practice/calendar to v1.03.
 practice=practiceV7; cal=calendarV7;
 // Use selected tyre everywhere old engine assumed set 0.
 const _oldLapTimeV7=lapTime;lapTime=function(x){let old=s.tires[0],idx=s.v7.activeTyre;s.tires[0]=s.tires[idx];let r=_oldLapTimeV7(x);s.tires[0]=old;return r}
@@ -378,7 +378,7 @@ const _oldFinishEventV7=finishEvent;finishEvent=function(){_oldFinishEventV7();s
 const _oldNewSeasonV7=newSeason;newSeason=function(){_oldNewSeasonV7();s.v7.calendar=generateCalendarV7(s.season||2028);s.event=0;render()}
 
 
-// ---- v0.9: new game / reset controls ----
+// ---- v1.03: new game / reset controls ----
 function confirmNewGame(){
   if(!confirm("Starta ett helt nytt spel? Din nuvarande sparfil på den här enheten kommer att ersättas.")) return;
   try{
@@ -396,7 +396,7 @@ const _navRV8=navR;
 navR=function(){_navRV8();nav.innerHTML+=newGameButton()}
 
 
-// ---- v0.9 hotfix: v0.7 calendar is now used by garage/event flow ----
+// ---- v1.03 hotfix: v0.7 calendar is now used by garage/event flow ----
 function garageV9(){
  ensureV7();
  let ev=currentCal()[s.event],ready=s.membership&&s.license&&s.safety;
@@ -423,6 +423,235 @@ function goWeekendV9(){
  tab="raceWeekend";save();render();
 }
 garage=garageV9;enter=enterV9;
+
+
+// ---- v1.03 critical race-weekend routing fix ----
+function raceWeekendV10(){
+  ensureV7();
+  if(!s.session)s.session="practice";
+  try{
+    if(s.session==="practice") return practiceV7();
+    if(s.session==="qual") return qual();
+    if(s.session==="race") return raceIntro();
+    if(s.session==="live") return liveViewV6();
+    if(s.session==="result") return resultView();
+    s.session="practice"; return practiceV7();
+  }catch(err){
+    console.error("Race weekend recovery:",err);
+    s.session="practice";
+    main.innerHTML=`<section class="hero"><span class="badge red">RACEHELGEN</span><h1>Något i den gamla sparningen krockade</h1><p>Spelet har fångat felet i stället för att låsa sig.</p><div class="controls"><button class="btn primary" onclick="repairWeekendV10()">Återställ racehelgen</button><button class="btn" onclick="tab='garage';render()">Till garaget</button></div></section>`;
+    save();
+  }
+}
+function repairWeekendV10(){
+ ensureV7();
+ s.session="practice";s.entered=true;s.raceNo=0;live=null;
+ s.weather=s.weather||makeWeather();
+ s.v7.practiceRuns=0;s.v7.knowledge=0;s.v7.feedback="Ingen data ännu.";
+ if(!Array.isArray(s.tires)||!s.tires.length)s.tires=[100,100];
+ if(s.v7.activeTyre>=s.tires.length)s.v7.activeTyre=0;
+ tab="raceWeekend";save();practiceV7();
+}
+function goWeekendV10(){
+ ensureV7();
+ s.entered=true;
+ if(!["practice","qual","race","live","result"].includes(s.session))s.session="practice";
+ tab="raceWeekend";save();raceWeekendV10();
+}
+raceWeekend=raceWeekendV10;
+goWeekendV9=goWeekendV10;
+
+
+// ---- v1.03: explicit weekend CTA; planning no longer blocks race entry ----
+function garageV11(){
+ ensureV7();
+ let ev=currentCal()[s.event], ready=s.membership&&s.license&&s.safety;
+ let raceButtons="";
+ if(ev){
+   if(!ready){
+     raceButtons=`<button class="btn primary" disabled>Racehelg låst – ordna administrationen</button>`;
+   }else if(!s.entered){
+     raceButtons=`<button class="btn good" onclick="enterV11()">Anmäl & åk till ${ev[0]} – 6 500 kr</button>`;
+   }else{
+     raceButtons=`<button class="btn primary" onclick="goWeekendV10()">🏁 Fortsätt till racehelgen</button>`;
+   }
+   raceButtons+=`<button class="btn" onclick="tab='week';render()">Planera veckan (${s.activities} aktiviteter kvar)</button>`;
+ }else raceButtons=`<button class="btn primary" onclick="seasonSummary()">Säsongssammanfattning</button>`;
+ main.innerHTML=`<section class="hero"><span class="badge">${s.cls}</span><h1>${s.team}</h1><p>#117 • ${s.name} • ${ev?"Nästa: "+ev[0]+" • "+ev[1]:"Säsongen är färdig"}</p><div class="controls">${raceButtons}</div></section>
+ <div class="grid"><div class="card span4"><h2>Budget</h2><div class="big money">${m(s.cash)}</div><div class="row"><span>Anmäld</span><b>${s.entered?"Ja":"Nej"}</b></div><div class="row"><span>Sponsor</span><b>${s.sponsor?s.sponsor.name:"Ingen"}</b></div></div>
+ <div class="card span4"><h2>Förare</h2><div class="row"><span>OVR</span><b>${s.driver}</b></div>${bar(s.driver)}<div class="row"><span>Självförtroende</span><b>${s.confidence}%</b></div>${bar(s.confidence)}</div>
+ <div class="card span4"><h2>Administration</h2>${req("membership","Medlemskap",650)}${req("license","SBF-licens",2200)}${req("safety","Säkerhetsutrustning",12500)}${ready?`<div class="event">✅ Klar för tävling</div>`:`<div class="event hot">Du måste ordna alla tre innan anmälan.</div>`}</div>
+ <div class="card span7"><h2>Komponenter</h2>${part("Motor","engine")}${part("Växellåda","gearbox")}${part("Bromsar","brakes")}${part("Fjädring","suspension")}${part("Drivlina","drivetrain")}${part("Kaross","body")}<div class="controls"><button class="btn" onclick="repair()">Garagekväll – 3 800</button></div></div>
+ <div class="span5">${tyreSelector()}<div class="card" style="margin-top:12px"><h2>Inför nästa helg</h2><p>Veckoplaneringen är frivillig. När administrationen är klar kan du anmäla dig och åka till banan direkt.</p></div></div></div>`;save();
+}
+function enterV11(){
+ ensureV7();
+ if(!(s.membership&&s.license&&s.safety))return alert("Ordna medlemskap, licens och säkerhetsutrustning först.");
+ if(s.cash<6500)return alert("Du behöver 6 500 kr för anmälan.");
+ s.cash-=6500;s.stats.costs+=6500;s.entered=true;s.raceNo=0;s.session="practice";s.weather=makeWeather();
+ s.v7.practiceRuns=0;s.v7.knowledge=0;s.v7.feedback="Ingen data ännu.";
+ tab="raceWeekend";save();raceWeekendV10();
+}
+garage=garageV11;garageV9=garageV11;enter=enterV11;enterV9=enterV11;
+
+
+// ---- v1.03: hard migration + self-contained race weekend ----
+function normalizeV12(){
+ const d=fresh();
+ for(const k of ["setup","car","parts","stats","champ"]) if(!s[k]||typeof s[k]!=="object") s[k]=JSON.parse(JSON.stringify(d[k]));
+ s.setup.balance=Number.isFinite(+s.setup.balance)?+s.setup.balance:50;
+ s.setup.pressure=Number.isFinite(+s.setup.pressure)?+s.setup.pressure:50;
+ s.parts={...d.parts,...s.parts}; s.stats={...d.stats,...s.stats};
+ s.champ={Standard:{...(s.champ.Standard||{})},Modified:{...(s.champ.Modified||{})}};
+ if(!Array.isArray(s.tires)||!s.tires.length)s.tires=[100,100];
+ s.tires=s.tires.map(x=>Number.isFinite(+x)?+x:100);
+ if(!Array.isArray(s.log))s.log=[];
+ if(!s.weather)s.weather=makeWeather();
+ ensureV7();
+ if(!s.v7.calendar?.length)s.v7.calendar=generateCalendarV7(s.season||2027);
+ s.v7.activeTyre=Math.max(0,Math.min(s.tires.length-1,+s.v7.activeTyre||0));
+ s.v7.practiceRuns=+s.v7.practiceRuns||0;s.v7.knowledge=+s.v7.knowledge||0;
+ if(typeof s.v7.feedback!=="string")s.v7.feedback="Ingen data ännu.";
+}
+function practiceV12(){
+ normalizeV12();
+ let ev=currentCal()[s.event]||currentCal()[0], td=TRACK_POOL.find(x=>x[0]===ev[0])||TRACK_POOL[0];
+ let ideal=td[3]||{bal:50,press:50,key:"balans"};
+ let runs=s.v7.practiceRuns, tyre=s.tires[s.v7.activeTyre];
+ let score=Math.max(0,Math.min(100,100-Math.abs(s.setup.balance-ideal.bal)*8-Math.abs(s.setup.pressure-ideal.press)*7+(s.v7.knowledge*.12)));
+ main.innerHTML=`<section class="hero"><span class="badge red">${ev[0]} • TRÄNING</span><h1>Racehelgen är igång</h1><p>${s.weather==="Regn"?"🌧️":s.weather==="Mulet"?"☁️":"☀️"} ${s.weather} • Träningspass ${runs}/4 • Bankännedom ${Math.round(s.v7.knowledge)}%</p></section>
+ <div class="grid"><div class="card span7"><h2>Förarfeedback</h2><div class="event">${s.v7.feedback}</div>
+ <h2 style="margin-top:18px">Setup</h2>
+ <div class="row"><span>Balans</span><b>${s.setup.balance}</b></div><div class="controls"><button class="btn" onclick="setupV12('balance',-1)">← Stabilare</button><button class="btn" onclick="setupV12('balance',1)">Mer rotation →</button></div>
+ <div class="row"><span>Däcktryck</span><b>${s.setup.pressure}</b></div><div class="controls"><button class="btn" onclick="setupV12('pressure',-1)">− Tryck</button><button class="btn" onclick="setupV12('pressure',1)">+ Tryck</button></div>
+ <div class="row"><span>Setup-förtroende</span><b>${runs?Math.round(score)+"%":"?"}</b></div>${runs?bar(score):""}
+ <p class="muted">Träningen gör feedbacken tydligare. Setupen påverkar sedan både kval- och racefart.</p>
+ <div class="controls"><button class="btn primary" ${runs>=4?"disabled":""} onclick="practiceRunV12()">Kör träningspass</button><button class="btn good" onclick="toQualStable()">Fortsätt till kval →</button><button class="btn" onclick="tab='garage';render()">Till garaget</button></div></div>
+ <div class="card span5"><h2>🛞 Däck</h2>${s.tires.map((x,i)=>`<div class="row"><span>Set ${String.fromCharCode(65+i)} ${i===s.v7.activeTyre?"• MONTERAT":""}</span><b>${Math.round(x)}%</b></div>${bar(x)}<button class="btn smallbtn" ${i===s.v7.activeTyre?"disabled":""} onclick="selectTyreV12(${i})">Montera set ${String.fromCharCode(65+i)}</button>`).join("")}
+ <h2 style="margin-top:20px">Banan</h2><p>${td[1]}</p><p class="muted">Nyckel: ${ideal.key||"balans"}.</p></div></div>`;save();
+}
+function setupV12(k,d){normalizeV12();s.setup[k]=Math.max(35,Math.min(65,s.setup[k]+d));updateFeedbackV12();practiceV12()}
+function updateFeedbackV12(){
+ let td=trackData(),ideal=td[3]||{bal:50,press:50};let b=s.setup.balance-ideal.bal,p=s.setup.pressure-ideal.press,k=s.v7.knowledge,bits=[];
+ if(k<20){s.v7.feedback="Du behöver fler varv för att förstå bilen.";return}
+ bits.push(Math.abs(b)<=1?"Balansen känns nära rätt":b<0?"Bilen känns trygg men vill inte riktigt rotera":"Bakvagnen känns nervös och bilen roterar mycket");
+ if(k>=40)bits.push(Math.abs(p)<=1?"Däcktrycket känns bra":p<0?"Däcken tar tid att komma upp i temperatur":"Däcken tappar grepp när de blir varma");
+ if(k>=70)bits.push(`Telemetrin pekar mot ungefär balans ${ideal.bal} och tryck ${ideal.press}`);
+ s.v7.feedback=bits.join(". ")+".";
+}
+function practiceRunV12(){
+ normalizeV12();if(s.v7.practiceRuns>=4)return;
+ let i=s.v7.activeTyre;if(s.tires[i]<8)return alert("Det monterade däcksetet är för slitet.");
+ s.v7.practiceRuns++;s.v7.knowledge=Math.min(100,s.v7.knowledge+24);s.tires[i]=Math.max(0,s.tires[i]-4);s.parts.brakes=Math.max(20,s.parts.brakes-1);updateFeedbackV12();practiceV12();
+}
+function selectTyreV12(i){normalizeV12();s.v7.activeTyre=i;practiceV12()}
+function toQualV12(){normalizeV12();s.session="qual";save();qual()}
+function raceWeekendV12(){
+ normalizeV12();
+ if(s.session==="qual")return qual();
+ if(s.session==="race")return raceIntro();
+ if(s.session==="live")return liveViewV6();
+ if(s.session==="result")return resultView();
+ s.session="practice";return practiceV12();
+}
+function goWeekendV12(){normalizeV12();s.entered=true;if(!["practice","qual","race","live","result"].includes(s.session))s.session="practice";tab="raceWeekend";save();raceWeekendV12()}
+function enterV12(){
+ normalizeV12();if(!(s.membership&&s.license&&s.safety))return alert("Ordna administrationen först.");if(s.cash<6500)return alert("Du behöver 6 500 kr.");
+ s.cash-=6500;s.stats.costs+=6500;s.entered=true;s.raceNo=0;s.session="practice";s.v7.practiceRuns=0;s.v7.knowledge=0;s.v7.feedback="Ingen data ännu.";tab="raceWeekend";save();practiceV12();
+}
+practice=practiceV12;practiceV7=practiceV12;raceWeekend=raceWeekendV12;raceWeekendV10=raceWeekendV12;goWeekendV10=goWeekendV12;goWeekendV9=goWeekendV12;enter=enterV12;enterV9=enterV12;enterV11=enterV12;
+normalizeV12();
+
+
+// ---- v1.03: self-contained qualifying, no legacy dependency ----
+function qualV13(){
+ normalizeV12();
+ let ev=currentCal()[s.event]||currentCal()[0];
+ main.innerHTML=`<section class="hero"><span class="badge red">${ev[0]} • KVAL</span><h1>Dags att sätta tiden</h1>
+ <p>${s.weather==="Regn"?"🌧️ Blött":"🏁 "+s.weather} • Setup-förtroende ${s.v7.practiceRuns?Math.round(setupScore())+"%":"lågt"} • Däckset ${String.fromCharCode(65+s.v7.activeTyre)} ${Math.round(activeTyre())}%</p></section>
+ <div class="choice">
+ <button onclick="doQualV13(0)"><strong>Säkert varv</strong><span class="muted">Prioritera en giltig tid. Minst risk.</span></button>
+ <button onclick="doQualV13(1)"><strong>Attack</strong><span class="muted">Bra balans mellan fart och risk.</span></button>
+ <button onclick="doQualV13(2)"><strong>Maximum</strong><span class="muted">Allt på ett varv. Risk för misstag.</span></button>
+ </div><div class="controls"><button class="btn" onclick="s.session='practice';practiceV12()">← Till träningen</button></div>`;save();
+}
+function doQualV13(risk){
+ normalizeV12();
+ let tyre=activeTyre();if(tyre<5)return alert("Det monterade däcksetet är för slitet. Gå tillbaka till träningen och byt set.");
+ let f=field().map(x=>({...x,p:pace(x,5.5)}));
+ let me=f.find(x=>x.you);
+ // Modified remains clearly faster; player gains from preparation, setup and fresh tyres.
+ let prep=(s.v7.knowledge||0)*.012+(setupScore()-70)*.045+(tyre-50)*.006;
+ me.p+=prep+[0,.8,1.7][risk];
+ let mistake=false;
+ let mistakeChance=[.02,.08,.20][risk]-(s.v7.knowledge||0)*.0005;
+ if(Math.random()<Math.max(.01,mistakeChance)){me.p-=6+Math.random()*5;mistake=true}
+ f.sort((a,b)=>b.p-a.p);
+ s.qual=f;s.grid=f.findIndex(x=>x.you)+1;
+ s.classGrid=f.filter(x=>x.cls===s.cls).findIndex(x=>x.you)+1;
+ if(s.classGrid===1)s.stats.poles++;
+ let i=s.v7.activeTyre;s.tires[i]=Math.max(0,s.tires[i]-(risk===2?7:5));
+ s.session="race";save();
+ qualResultV13(mistake);
+}
+function qualResultV13(mistake){
+ let ev=currentCal()[s.event]||currentCal()[0];
+ main.innerHTML=`<section class="hero"><span class="badge red">${ev[0]} • KVALRESULTAT</span><h1>P${s.grid} totalt • P${s.classGrid} ${s.cls}</h1>
+ <p>${mistake?"Du gjorde ett misstag på attackvarvet och lämnade tid på bordet.":"Du fick ihop kvalvarvet."}</p>
+ <div class="controls"><button class="btn primary" onclick="raceIntroV13()">Till Race ${s.raceNo+1} →</button></div></section>
+ <div class="card"><h2>Startuppställning</h2><table><tr><th>P</th><th>Förare</th><th>Klass</th></tr>${s.qual.slice(0,20).map((x,i)=>`<tr class="${x.you?'you':''}"><td>${i+1}</td><td>${x.n}</td><td>${x.cls}</td></tr>`).join("")}</table></div>`;
+}
+function raceIntroV13(){
+ normalizeV12();s.session="race";
+ let ev=currentCal()[s.event]||currentCal()[0], laps=ev[3]||16;
+ main.innerHTML=`<section class="hero"><span class="badge red">${ev[0]} • RACE ${s.raceNo+1}</span><h1>Start P${s.grid} • P${s.classGrid} ${s.cls}</h1><p>${s.weather} • ${laps} varv. Välj din första raceplan.</p></section>
+ <div class="choice"><button onclick="startRace(0)"><strong>Kontrollerat</strong><span class="muted">Skydda bil och däck.</span></button><button onclick="startRace(1)"><strong>Normalt</strong><span class="muted">Balanserad öppning.</span></button><button onclick="startRace(2)"><strong>Attack</strong><span class="muted">Försök vinna platser direkt.</span></button></div>`;save();
+}
+qual=qualV13;doQual=doQualV13;raceIntro=raceIntroV13;
+function raceWeekendV13(){
+ normalizeV12();
+ if(s.session==="qual")return qualV13();
+ if(s.session==="race")return raceIntroV13();
+ if(s.session==="live")return liveViewV6();
+ if(s.session==="result")return resultView();
+ s.session="practice";return practiceV12();
+}
+raceWeekend=raceWeekendV13;raceWeekendV12=raceWeekendV13;raceWeekendV10=raceWeekendV13;
+
+
+// ---- v1.03 race-flow lock: direct state transitions, no legacy dispatcher between sessions ----
+function toQualV14(){
+ normalizeV12();
+ s.session="qual";
+ save();
+ qualV13();
+}
+function toRaceV14(){
+ normalizeV12();
+ s.session="race";
+ save();
+ raceIntroV13();
+}
+// Rebind in case an older rendered screen or alias calls these names.
+toQualV12=toQualV14;
+qual=qualV13;
+raceIntro=raceIntroV13;
+// Visible diagnostic/status strip during race weekend.
+function raceFlowStatusV14(){
+ return `Träning ${s.v7?.practiceRuns||0}/4 → Kval → Race 1 → Race 2`;
+}
+
+
+// ---- v1.03 minimal stable qualification fix ----
+function toQualStable(){
+  ensureV7();
+  if(!s.setup)s.setup={balance:50,pressure:50};
+  s.session="qual";
+  save();
+  qualV13();
+}
+toQualV14=toQualStable;
+toQualV12=toQualStable;
 
 render();
 </script></body></html>
