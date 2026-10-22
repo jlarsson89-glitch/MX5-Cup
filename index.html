@@ -22,6 +22,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:9px;borde
 .event{padding:12px;border-left:3px solid var(--blue);background:#18202c;margin:8px 0;border-radius:5px}.event.hot{border-color:var(--accent)}.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
 input{background:#0e131a;color:white;border:1px solid var(--line);border-radius:8px;padding:10px;width:100%}.setup{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:800px){.span4,.span5,.span6,.span7,.span8{grid-column:span 12}.choice,.setup{grid-template-columns:1fr}.top{align-items:flex-start;gap:10px;flex-direction:column}}
+
+.livegap{font-variant-numeric:tabular-nums}.decision{border:1px solid #a33;padding:14px;border-radius:12px;margin:12px 0;background:#1b1111}
+.flag{font-weight:800;letter-spacing:.08em}.yellow{color:#ffd35a}.green{color:#71e38a}
+.smallbtn{padding:6px 9px;font-size:.82rem}.newsgrid{display:grid;gap:10px}
 </style>
 </head>
 <body><div class="app">
@@ -40,14 +44,14 @@ const CAL=[
 ["Mantorp Park","28–30 augusti","Motor • bromsar • omkörning",16]
 ],PTS=[45,41,37,33,30,27,24,21,19,17,15,13,11,9,7,5,3,1];
 const traits=["Iskall","Stark starter","Sen bromsare","Jämn","Regnspecialist","Defensiv","Kvalspecialist","Aggressiv"];
-const fresh=()=>({started:false,name:"Jakob",team:"Jakob Racing",cls:"Standard",cash:175000,privateCash:30000,rep:8,driver:68,confidence:54,energy:100,event:0,raceNo:0,week:0,license:false,membership:false,safety:false,entered:false,session:null,weather:null,setup:{balance:50,pressure:50},car:{condition:91,motor:82,chassis:84,brakes:78,reliability:90},parts:{engine:92,gearbox:94,brakes:84,suspension:91,drivetrain:93,body:100},tires:[100,100],champ:{Standard:{},Modified:{}},stats:{starts:0,wins:0,podiums:0,poles:0,dnf:0,best:99,modifiedBeaten:0,incidents:0,costs:0},history:[],log:[],sponsor:null,relations:{},milestones:["Första race"],activities:3});
+const fresh=()=>({started:false,name:"Jakob",team:"Jakob Racing",cls:"Standard",cash:175000,privateCash:30000,rep:8,driver:68,confidence:54,energy:100,event:0,raceNo:0,week:0,license:false,membership:false,safety:false,entered:false,session:null,weather:null,setup:{balance:50,pressure:50},car:{condition:91,motor:82,chassis:84,brakes:78,reliability:90},parts:{engine:92,gearbox:94,brakes:84,suspension:91,drivetrain:93,body:100},tires:[100,100],champ:{Standard:{},Modified:{}},stats:{starts:0,wins:0,podiums:0,poles:0,dnf:0,best:99,modifiedBeaten:0,incidents:0,costs:0},history:[],log:[],sponsor:null,relations:{},rivals:{},news:[],season:2027,market:[],milestones:["Första race"],activities:3});
 let s=JSON.parse(localStorage.getItem("mx5cm_save_v03")||"null")||fresh(),tab=s.started?"garage":"start",live=null;
 function save(){localStorage.setItem("mx5cm_save_v03",JSON.stringify(s))}
 const m=n=>n.toLocaleString("sv-SE")+" kr", clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function bar(v){return `<div class="bar"><i style="width:${clamp(v,0,100)}%"></i></div>`}
-function navR(){let a=[["garage","Garage"],["calendar","Kalender"],["drivers","Förare"],["championship","Mästerskap"],["economy","Ekonomi"],["stats","Statistik"]];nav.innerHTML=a.map(x=>`<button class="${tab==x[0]?'active':''}" onclick="tab='${x[0]}';render()">${x[1]}</button>`).join("")}
-function render(){date.textContent=s.started?`2027 • ${s.event<4?CAL[s.event][0]:"Säsongen klar"}`:"Ny karriär";if(!s.started){nav.innerHTML="";return start()}navR();({garage,calendar:cal,drivers:driverPage,championship:champ,economy:econ,stats:statsPage,week:weekPage,raceWeekend})[tab]?.();save()}
-function start(){main.innerHTML=`<section class="hero"><span class="badge red">v0.3 • GARAGELIV</span><h1 style="margin-top:12px">MX-5 Cup Manager</h1><p>Nu med väder, komponenter, däck, sponsorer, aktiviteter, förarprofiler, relationer, incidenter, DNF, live-race och full poängräkning i båda klasserna.</p></section><div class="grid"><div class="card span6"><h2>Din förare</h2><input id="pn" value="Jakob"><br><br><input id="tn" value="Jakob Racing"></div><div class="card span6"><h2>Välj klass</h2><div class="choice"><button onclick="begin('Standard')"><strong>Standard Cup</strong><span class="muted">Den naturliga vägen in.</span></button><button onclick="begin('Modified')"><strong>Modified Cup</strong><span class="muted">Snabbare och dyrare.</span></button></div></div></div>`}
+function navR(){let a=[["garage","Garage"],["calendar","Kalender"],["drivers","Förare"],["championship","Mästerskap"],["economy","Ekonomi"],["stats","Statistik"],["world","Racingvärlden"]];nav.innerHTML=a.map(x=>`<button class="${tab==x[0]?'active':''}" onclick="tab='${x[0]}';render()">${x[1]}</button>`).join("")}
+function render(){date.textContent=s.started?`${s.season||2027} • ${s.event<4?CAL[s.event][0]:"Säsongen klar"}`:"Ny karriär";if(!s.started){nav.innerHTML="";return start()}navR();({garage,calendar:cal,drivers:driverPage,championship:champ,economy:econ,stats:statsPage,world:worldPage,week:weekPage,raceWeekend})[tab]?.();save()}
+function start(){main.innerHTML=`<section class="hero"><span class="badge red">v0.8 • RACINGVÄRLDEN</span><h1 style="margin-top:12px">MX-5 Cup Manager</h1><p>Nu med en levande racingvärld: rivaliteter, depånyheter, AI-form, marknad, vinterbeslut och fler konsekvenser mellan tävlingarna.</p></section><div class="grid"><div class="card span6"><h2>Din förare</h2><input id="pn" value="Jakob"><br><br><input id="tn" value="Jakob Racing"></div><div class="card span6"><h2>Välj klass</h2><div class="choice"><button onclick="begin('Standard')"><strong>Standard Cup</strong><span class="muted">Den naturliga vägen in.</span></button><button onclick="begin('Modified')"><strong>Modified Cup</strong><span class="muted">Snabbare och dyrare.</span></button></div></div></div>`}
 function begin(c){s=fresh();s.started=true;s.name=pn.value||"Jakob";s.team=tn.value||"Jakob Racing";s.cls=c;if(c==="Modified"){s.cash=210000;s.driver=70;s.car.motor=88;s.car.chassis=88}s.log.unshift("Satsningen är igång.");tab="garage";render()}
 function cp(n){return s.champ[s.cls][n]||0}
 function garage(){let ev=CAL[s.event],ready=s.membership&&s.license&&s.safety;
@@ -70,7 +74,7 @@ function sponsorOffer(){if(s.sponsor){s.log.unshift("Du har redan ett aktivt spo
 function enter(){if(s.cash<6500)return;s.cash-=6500;s.stats.costs+=6500;s.entered=true;s.raceNo=0;s.session="practice";s.weather=makeWeather();tab="raceWeekend";render()}
 function makeWeather(){let r=Math.random();return r<.22?"Regn":r<.48?"Mulet":"Torrt"}
 function field(){let a=[];for(let cls of ["Modified","Standard"])for(let d of D[cls])a.push({num:d[0],n:d[1],cls,skill:d[2],trait:traits[(+d[0]||d[1].length)%traits.length]});a.push({num:"117",n:s.name,cls:s.cls,skill:s.driver,trait:"Du",you:true});return a}
-function pace(x,spread=8){let p=x.skill+(x.cls==="Modified"?8:0)+(Math.random()-.5)*spread;if(s.weather==="Regn"){p+=(x.trait==="Regnspecialist"?5:0);p+=(Math.random()-.5)*6}if(x.you){p+=s.car.chassis*.03+s.car.motor*.02+s.confidence*.02+(5-Math.abs(s.setup.balance-50)*.2);p+=(s.weather==="Regn"?2:0)}return p}
+function pace(x,spread=8){let p=x.skill+(x.cls==="Modified"?14:0)+(Math.random()-.5)*spread;if(s.weather==="Regn"){p+=(x.trait==="Regnspecialist"?5:0);p+=(Math.random()-.5)*6}if(x.you){p+=s.car.chassis*.03+s.car.motor*.02+s.confidence*.02+(5-Math.abs(s.setup.balance-50)*.2);p+=(s.weather==="Regn"?2:0)}return p}
 function raceWeekend(){if(s.session==="practice")practice();else if(s.session==="qual")qual();else if(s.session==="race")raceIntro();else if(s.session==="live")liveView();else resultView()}
 function practice(){let f=field().map(x=>({...x,p:pace(x)})).sort((a,b)=>b.p-a.p),me=f.findIndex(x=>x.you),cf=f.filter(x=>x.cls===s.cls),cm=cf.findIndex(x=>x.you);
 main.innerHTML=`<section class="hero"><span class="badge red">${CAL[s.event][0]} • TRÄNING</span><h1>${s.weather==="Regn"?"🌧️":s.weather==="Mulet"?"☁️":"☀️"} ${s.weather}</h1><p>P${me+1} totalt • P${cm+1} ${s.cls}. ${CAL[s.event][2]}.</p></section><div class="grid"><div class="card span7"><h2>Setup</h2><div class="setup"><div>Balans<input type="range" min="35" max="65" value="${s.setup.balance}" oninput="s.setup.balance=+this.value"></div><div>Däcktryck<input type="range" min="35" max="65" value="${s.setup.pressure}" oninput="s.setup.pressure=+this.value"></div></div><div class="controls"><button class="btn primary" onclick="s.session='qual';render()">Till kval</button></div></div><div class="card span5"><h2>Däck</h2><p>Aktivt set: ${s.tires[0]}%</p>${bar(s.tires[0])}<p class="muted">AR-1 används även om det regnar.</p></div></div>`}
@@ -78,22 +82,318 @@ function qual(){main.innerHTML=`<section class="hero"><span class="badge red">KV
 function doQual(r){let f=field().map(x=>({...x,p:pace(x,7)})),me=f.find(x=>x.you);me.p+=r*1.5;if(r==2&&Math.random()<.22)me.p-=10;f.sort((a,b)=>b.p-a.p);s.qual=f;s.grid=f.findIndex(x=>x.you)+1;s.classGrid=f.filter(x=>x.cls===s.cls).findIndex(x=>x.you)+1;if(s.classGrid===1)s.stats.poles++;s.tires[0]=Math.max(0,s.tires[0]-6);s.session="race";render()}
 function raceIntro(){main.innerHTML=`<section class="hero"><span class="badge red">RACE ${s.raceNo+1}</span><h1>Start P${s.grid} • P${s.classGrid} ${s.cls}</h1><p>${s.weather}. ${CAL[s.event][3]} varv. Välj hur hårt du vill köra.</p></section><div class="choice"><button onclick="startRace(0)"><strong>Kontrollerat</strong><span class="muted">Skydda bilen.</span></button><button onclick="startRace(1)"><strong>Normal attack</strong><span class="muted">Välj lägen.</span></button><button onclick="startRace(2)"><strong>Hård attack</strong><span class="muted">Mer risk och slitage.</span></button></div>`}
 function startRace(risk){let f=(s.qual||field()).map(x=>({...x,score:pace(x,5),dnf:false}));live={lap:0,laps:CAL[s.event][3],risk,field:f,events:["Starten går!"],finished:false};s.session="live";advanceLaps()}
-function advanceLaps(){if(!live||live.finished)return;for(let z=0;z<3&&live.lap<live.laps;z++){live.lap++;for(let x of live.field){if(x.dnf)continue;x.score+=((Math.random()-.5)*2)+(x.trait==="Jämn"?.2:0);if(Math.random()<.004+(s.weather==="Regn"?.004:0)){x.dnf=true;live.events.unshift(`Varv ${live.lap}: ${x.n} bryter med problem.`)}}let me=live.field.find(x=>x.you);if(!me.dnf&&Math.random()<(.008+live.risk*.006+(s.weather==="Regn"?.006:0))){if(Math.random()<.25){me.dnf=true;s.stats.dnf++;live.events.unshift(`Varv ${live.lap}: Du tvingas bryta!`)}else{me.score-=5;s.parts.body-=5;s.stats.incidents++;live.events.unshift(`Varv ${live.lap}: Kontakt! Du tappar tid.`)}}live.field.sort((a,b)=>(a.dnf? -999:a.score)-(b.dnf?-999:b.score)).reverse();if(Math.random()<.35){let mep=live.field.findIndex(x=>x.you);let near=live.field[Math.max(0,mep-1)];if(near&&!near.you)live.events.unshift(`Varv ${live.lap}: Du ligger tätt med ${near.n}.`)}}if(live.lap>=live.laps){live.finished=true;finishRace()}liveView()}
+function advanceLaps(){if(!live||live.finished)return;for(let z=0;z<3&&live.lap<live.laps;z++){live.lap++;for(let x of live.field){if(x.dnf)continue;x.score+=((Math.random()-.5)*2)+(x.trait==="Jämn"?.2:0);if(Math.random()<.004+(s.weather==="Regn"?.004:0)){x.dnf=true;live.events.unshift(`Varv ${live.lap}: ${x.n} bryter med problem.`)}}let me=live.field.find(x=>x.you);if(!me.dnf&&Math.random()<(.008+live.risk*.006+(s.weather==="Regn"?.006:0))){if(Math.random()<.25){me.dnf=true;s.stats.dnf++;live.events.unshift(`Varv ${live.lap}: Du tvingas bryta!`)}else{me.score-=5;s.parts.body-=5;s.stats.incidents++;let near=live.field[Math.max(0,live.field.findIndex(q=>q.you)-1)];if(near&&!near.you){s.rivals[near.n]=clamp((s.rivals[near.n]||0)+12,0,100);s.relations[near.n]=(s.relations[near.n]||0)-8;live.events.unshift(`Varv ${live.lap}: Kontakt med ${near.n}! Rivaliteten ökar.`)}else live.events.unshift(`Varv ${live.lap}: Kontakt! Du tappar tid.`)}}live.field.sort((a,b)=>(a.dnf? -999:a.score)-(b.dnf?-999:b.score)).reverse();if(Math.random()<.35){let mep=live.field.findIndex(x=>x.you);let near=live.field[Math.max(0,mep-1)];if(near&&!near.you)live.events.unshift(`Varv ${live.lap}: Du ligger tätt med ${near.n}.`)}}if(live.lap>=live.laps){live.finished=true;finishRace()}liveView()}
 function liveView(){let f=live.field,me=f.findIndex(x=>x.you),cf=f.filter(x=>x.cls===s.cls&&!x.dnf),cm=cf.findIndex(x=>x.you);main.innerHTML=`<section class="hero"><span class="badge red">LIVE • VARV ${live.lap}/${live.laps}</span><h1>${f[me]?.dnf?"DNF":`P${me+1} totalt • P${cm+1} ${s.cls}`}</h1><p>${s.weather==="Regn"?"🌧️ Blött och halt":"🏁 "+s.weather} • Däck ${s.tires[0]}%</p><div class="controls">${!live.finished?`<button class="btn primary" onclick="advanceLaps()">Kör 3 varv</button><button class="btn" onclick="while(!live.finished)advanceLaps()">Kör till mål</button>`:`<button class="btn primary" onclick="s.session='result';render()">Resultat</button>`}</div></section><div class="grid"><div class="card span8"><h2>Live timing</h2>${resultTable(f)}</div><div class="card span4"><h2>Race control</h2>${live.events.slice(0,7).map(x=>`<div class="event ${x.includes("Kontakt")||x.includes("bryter")?"hot":""}">${x}</div>`).join("")}</div></div>`}
 function finishRace(){let f=live.field,classified=f.filter(x=>!x.dnf);for(let cls of ["Standard","Modified"]){let cf=classified.filter(x=>x.cls===cls);cf.forEach((x,i)=>s.champ[cls][x.n]=(s.champ[cls][x.n]||0)+(PTS[i]||0)+2)}let me=f.find(x=>x.you),op=f.findIndex(x=>x.you)+1,cf=classified.filter(x=>x.cls===s.cls),cp=me.dnf?99:cf.findIndex(x=>x.you)+1,earned=me.dnf?0:(PTS[cp-1]||0)+2;s.stats.starts++;if(cp===1)s.stats.wins++;if(cp<=3)s.stats.podiums++;s.stats.best=Math.min(s.stats.best,cp);if(!me.dnf&&s.cls==="Standard"){let mb=classified.filter(x=>x.cls==="Modified"&&f.indexOf(x)>f.indexOf(me)).length;s.stats.modifiedBeaten+=mb}if(s.sponsor&&cp<=10){s.cash+=s.sponsor.bonus;s.log.unshift(`Sponsorbonus ${m(s.sponsor.bonus)} för topp 10.`)}s.last={f,op,cp,earned,dnf:me.dnf};s.raceNo++;s.tires[0]=Math.max(0,s.tires[0]-(10+live.risk*3));for(let k of Object.keys(s.parts))s.parts[k]=clamp(s.parts[k]-(Math.random()*3+live.risk),20,100);s.history.push({track:CAL[s.event][0],race:s.raceNo,cp,op,earned,dnf:me.dnf});save()}
 function resultTable(f){let c={Standard:0,Modified:0};return `<table><tr><th>Tot</th><th>#</th><th>Förare</th><th>Klass</th><th>Klass-P</th></tr>${f.map((x,i)=>{let k=x.dnf?"DNF":++c[x.cls];return `<tr class="${x.you?'you':''}"><td>${x.dnf?"—":i+1}</td><td>${x.num}</td><td>${x.n}</td><td>${x.cls}</td><td>${k}</td></tr>`}).join("")}</table>`}
 function resultView(){let r=s.last,more=s.raceNo<2;main.innerHTML=`<section class="hero"><span class="badge red">MÅLFLAGG</span><h1>${r.dnf?"DNF":`P${r.op} totalt • P${r.cp} ${s.cls}`}</h1><p>${r.dnf?"En tung dag. Nu gäller det att få bilen redo igen.":r.cp<=3?"Pallplats! Det här kommer märkas i depån.":r.cp<=10?"Stark poängskörd.":"Ännu ett race i erfarenhetsbanken."}</p><div class="big">${r.earned} poäng</div><div class="controls">${more?`<button class="btn primary" onclick="s.session='race';render()">Race 2</button>`:`<button class="btn primary" onclick="finishEvent()">Avsluta helgen</button>`}</div></section><div class="card">${resultTable(r.f)}</div>`}
-function finishEvent(){let bill=1800+Math.round((100-s.parts.body)*70);s.cash-=bill;s.stats.costs+=bill;s.log.unshift(`${CAL[s.event][0]} klar. Efterarbete och förbrukning: ${m(bill)}.`);s.event++;s.entered=false;s.session=null;s.raceNo=0;s.activities=3;s.weather=null;live=null;tab="garage";render()}
+function finishEvent(){let bill=1800+Math.round((100-s.parts.body)*70);s.cash-=bill;s.stats.costs+=bill;s.log.unshift(`${CAL[s.event][0]} klar. Efterarbete och förbrukning: ${m(bill)}.`);generateNews();s.event++;s.entered=false;s.session=null;s.raceNo=0;s.activities=3;s.weather=null;live=null;tab="garage";render()}
 function cal(){main.innerHTML=`<h1>Kalender</h1><div class="grid">${CAL.map((x,i)=>`<div class="card span6"><span class="badge">2 race</span><h2 style="margin-top:10px">${x[0]}</h2><div class="row"><span>Datum</span><b>${x[1]}</b></div><div class="row"><span>Karaktär</span><b>${x[2]}</b></div><div class="row"><span>Status</span><b>${i<s.event?"Körd":i===s.event?"Nästa":"Kommande"}</b></div></div>`).join("")}</div>`}
 function driverPage(){main.innerHTML=`<h1>Förarvärlden</h1><p class="muted">Personlighetsegenskaperna är spelmekanik och beskriver inte de verkliga personerna.</p><div class="grid">${["Modified","Standard"].map(cls=>`<div class="card span6"><h2>${cls}</h2><table><tr><th>#</th><th>Förare</th><th>OVR</th><th></th></tr>${D[cls].map(d=>`<tr><td>${d[0]}</td><td>${d[1]}</td><td>${d[2]}</td><td><button class="btn" onclick="profile('${cls}','${d[0]}')">Profil</button></td></tr>`).join("")}</table></div>`).join("")}</div>`}
-function profile(cls,num){let d=D[cls].find(x=>x[0]===num),tr=traits[(+d[0]||d[1].length)%traits.length],hist=s.history.length;main.innerHTML=`<section class="hero"><span class="badge">${cls}</span><h1>#${d[0]} ${d[1]}</h1><p>Spelstyrka ${d[2]} • Egenskap: ${tr}</p></section><div class="grid"><div class="card span6"><h2>2027</h2><div class="row"><span>Poäng</span><b>${s.champ[cls][d[1]]||0}</b></div><div class="row"><span>Form</span><b>${hist?"Säsong pågår":"—"}</b></div></div><div class="card span6"><h2>Mot dig</h2><p class="muted">Head-to-head och relation byggs upp när ni möts under karriären.</p><div class="row"><span>Relation</span><b>${s.relations[d[1]]||"Neutral"}</b></div></div></div><button class="btn" onclick="driverPage()">Tillbaka</button>`}
+function profile(cls,num){let d=D[cls].find(x=>x[0]===num),tr=traits[(+d[0]||d[1].length)%traits.length],hist=s.history.length;main.innerHTML=`<section class="hero"><span class="badge">${cls}</span><h1>#${d[0]} ${d[1]}</h1><p>Spelstyrka ${d[2]} • Egenskap: ${tr}</p></section><div class="grid"><div class="card span6"><h2>2027</h2><div class="row"><span>Poäng</span><b>${s.champ[cls][d[1]]||0}</b></div><div class="row"><span>Form</span><b>${hist?"Säsong pågår":"—"}</b></div></div><div class="card span6"><h2>Mot dig</h2><p class="muted">Head-to-head och relation byggs upp när ni möts under karriären.</p><div class="row"><span>Relation</span><b>${relationText(d[1])}</b></div><div class="row"><span>Rivalitet</span><b>${s.rivals[d[1]]||0}/100</b></div></div></div><button class="btn" onclick="driverPage()">Tillbaka</button>`}
 function standings(cls){let a=D[cls].map(d=>({n:d[1],p:s.champ[cls][d[1]]||0}));if(s.cls===cls)a.push({n:s.name,p:s.champ[cls][s.name]||0});a.sort((a,b)=>b.p-a.p);return `<table><tr><th>P</th><th>Förare</th><th>Poäng</th></tr>${a.map((x,i)=>`<tr class="${x.n===s.name?'you':''}"><td>${i+1}</td><td>${x.n}</td><td>${x.p}</td></tr>`).join("")}</table>`}
 function champ(){main.innerHTML=`<h1>Mästerskap</h1><div class="grid"><div class="card span6"><h2>Modified</h2>${standings("Modified")}</div><div class="card span6"><h2>Standard</h2>${standings("Standard")}</div></div>`}
 function econ(){main.innerHTML=`<h1>Ekonomi</h1><div class="grid"><div class="card span6"><h2>Racingbudget</h2><div class="big money">${m(s.cash)}</div><div class="row"><span>Privat reserv</span><b>${m(s.privateCash)}</b></div><div class="row"><span>Säsongens kostnader</span><b>${m(s.stats.costs)}</b></div><button class="btn" onclick="inject()">Skjut till 5 000 privat</button></div><div class="card span6"><h2>Sponsor</h2>${s.sponsor?`<h3>${s.sponsor.name}</h3><div class="row"><span>Grundbelopp</span><b>${m(s.sponsor.base)}</b></div><div class="row"><span>Topp 10-bonus</span><b>${m(s.sponsor.bonus)}</b></div>`:`<p class="muted">Ingen sponsor ännu. Lägg tid på sponsorjakt mellan tävlingarna.</p>`}</div></div>`}
 function inject(){if(s.privateCash<5000)return;s.privateCash-=5000;s.cash+=5000;render()}
 function statsPage(){main.innerHTML=`<h1>Karriärstatistik</h1><div class="grid">${stat("Starter",s.stats.starts)}${stat("Segrar",s.stats.wins)}${stat("Pallplatser",s.stats.podiums)}${stat("Pole",s.stats.poles)}${stat("DNF",s.stats.dnf)}${stat("Slagna Modified",s.stats.modifiedBeaten)}<div class="card span12"><h2>Resultathistorik</h2><table><tr><th>Bana</th><th>Race</th><th>Totalt</th><th>Klass</th><th>Poäng</th></tr>${s.history.map(h=>`<tr><td>${h.track}</td><td>${h.race}</td><td>${h.dnf?"DNF":"P"+h.op}</td><td>${h.dnf?"DNF":"P"+h.cp}</td><td>${h.earned}</td></tr>`).join("")}</table></div></div>`}
 function stat(n,v){return `<div class="card span4"><div class="muted">${n}</div><div class="big">${v}</div></div>`}
-function seasonSummary(){let pos=(()=>{let a=D[s.cls].map(d=>({n:d[1],p:s.champ[s.cls][d[1]]||0}));a.push({n:s.name,p:s.champ[s.cls][s.name]||0});a.sort((a,b)=>b.p-a.p);return a.findIndex(x=>x.n===s.name)+1})();main.innerHTML=`<section class="hero"><span class="badge red">SÄSONGEN 2027</span><h1>P${pos} i ${s.cls} Cup</h1><p>${s.stats.starts} starter • ${s.stats.wins} segrar • ${s.stats.podiums} pallplatser • ${s.stats.modifiedBeaten} Modified-bilar slagna.</p></section><div class="card"><h2>Vintern väntar</h2><p>v0.3 slutar här. Nästa steg blir riktig silly season, bilköp/försäljning, klassbyte, AI-karriärer och en ny kalender.</p><button class="btn primary" onclick="newSeason()">Starta prototyp-2028</button></div>`}
-function newSeason(){s.event=0;s.week=0;s.champ={Standard:{},Modified:{}};s.entered=false;s.activities=3;s.log.unshift("2028 börjar. Vinterutvecklingen kommer i nästa version.");tab="garage";render()}
+function seasonSummary(){let pos=(()=>{let a=D[s.cls].map(d=>({n:d[1],p:s.champ[s.cls][d[1]]||0}));a.push({n:s.name,p:s.champ[s.cls][s.name]||0});a.sort((a,b)=>b.p-a.p);return a.findIndex(x=>x.n===s.name)+1})();main.innerHTML=`<section class="hero"><span class="badge red">SÄSONGEN ${s.season}</span><h1>P${pos} i ${s.cls} Cup</h1><p>${s.stats.starts} starter • ${s.stats.wins} segrar • ${s.stats.podiums} pallplatser • ${s.stats.modifiedBeaten} Modified-bilar slagna.</p></section><div class="grid"><div class="card span6"><h2>Vintern väntar</h2><p>Nu måste du bestämma riktning för nästa säsong.</p><div class="choice"><button onclick="winterChoice('stay')"><strong>Fortsätt ${s.cls}</strong><span class="muted">Behåll bilen och utveckla paketet.</span></button>${s.cls==='Standard'?`<button onclick="winterChoice('modified')"><strong>Ta steget till Modified</strong><span class="muted">Dyrare, snabbare och tuffare.</span></button>`:''}</div></div><div class="card span6"><h2>Årets siffror</h2><div class="row"><span>Bästa klassresultat</span><b>${s.stats.best===99?'—':'P'+s.stats.best}</b></div><div class="row"><span>DNF</span><b>${s.stats.dnf}</b></div><div class="row"><span>Incidenter</span><b>${s.stats.incidents}</b></div><div class="row"><span>Kostnader</span><b>${m(s.stats.costs)}</b></div></div></div>`}
+function relationText(n){let v=s.relations[n]||0;return v>20?"Bra":v<-20?"Spänd":"Neutral"}
+function generateNews(){let e=CAL[s.event]?.[0]||"helgen";let pool=[`Depån summerar en intensiv helg på ${e}.`,`Ryktet går om att flera förare tittar på klassbyte till nästa år.`,`En gästförare sonderar möjligheten till en start senare under säsongen.`,`Däckslitage blev ett stort samtalsämne efter ${e}.`,`Flera team stannade kvar sent i depån för reparationer.`];if(s.last&&!s.last.dnf&&s.last.cp<=5)pool.push(`${s.name} nämns som en av helgens positiva överraskningar.`);s.news.unshift(pool[Math.floor(Math.random()*pool.length)]);s.news=s.news.slice(0,10)}
+function worldPage(){let rivals=Object.entries(s.rivals).sort((a,b)=>b[1]-a[1]).slice(0,5);let leaders=[...D.Standard,...D.Modified].sort(()=>Math.random()-.5).slice(0,4);main.innerHTML=`<section class="hero"><span class="badge red">RACINGVÄRLDEN</span><h1>Depån lever även mellan racen</h1><p>Nyheter, rivaler och rörelser runt MX-5 Cup.</p></section><div class="grid"><div class="card span7"><h2>Senaste nytt</h2>${(s.news.length?s.news:["Säsongen har ännu inte hunnit skapa några stora rubriker."]).map(x=>`<div class="event">${x}</div>`).join("")}</div><div class="card span5"><h2>Dina rivaler</h2>${rivals.length?rivals.map(([n,v])=>`<div class="row"><span>${n}</span><b>${v}/100</b></div>${bar(v)}`).join(""):`<p class="muted">Inga rivaliteter ännu. Några hårda fighter kan ändra det snabbt.</p>`}<h2 style="margin-top:18px">Paddock</h2>${leaders.map(d=>`<div class="event">#${d[0]} ${d[1]} syns i depån. Formen inför nästa helg diskuteras.</div>`).join("")}</div></div>`}
+function winterChoice(c){if(c==='modified'){let cost=65000;if(s.cash<cost)return alert('Du behöver 65 000 kr i racingbudgeten för att bygga om/ta steget till Modified.');s.cash-=cost;s.stats.costs+=cost;s.cls='Modified';s.car.motor=Math.max(s.car.motor,88);s.car.chassis=Math.max(s.car.chassis,88);s.log.unshift('Stort beslut: teamet tar steget till Modified Cup.')}else{s.car.condition=clamp(s.car.condition+5,0,100);s.log.unshift(`Du fortsätter i ${s.cls} och bygger vidare på det du har.`)}newSeason()}
+function newSeason(){s.season++;s.event=0;s.week=0;s.champ={Standard:{},Modified:{}};s.entered=false;s.activities=3;s.history=[];s.stats.starts=0;s.stats.wins=0;s.stats.podiums=0;s.stats.poles=0;s.stats.dnf=0;s.stats.best=99;s.stats.modifiedBeaten=0;s.stats.incidents=0;s.news.unshift(`Säsongen ${s.season} är igång. Nya förväntningar i depån.`);tab="garage";render()}
+
+// ---- v0.8 race depth / migration ----
+function migrateV5(){
+  s.v5=s.v5||{};
+  s.v5.news=s.v5.news||[];
+  s.v5.racecraft=s.v5.racecraft||50;
+  s.v5.wet=s.v5.wet||50;
+  s.v5.decisions=s.v5.decisions||0;
+  s.v5.penalties=s.v5.penalties||0;
+  s.v5.fastest=s.v5.fastest||0;
+}
+migrateV5();
+
+function raceBase(x){
+  let p=(x.skill||70)+(x.cls==="Modified"?14:0);
+  if(s.weather==="Regn") p+=(x.trait==="Regnspecialist"?5:0)+(Math.random()-.5)*4;
+  if(x.you) p+=s.driver*.035+s.confidence*.018+s.car.motor*.018+s.car.chassis*.02;
+  return p;
+}
+function makeLiveV5(risk){
+  let f=(s.qual||field()).map((x,i)=>({...x,score:raceBase(x),dnf:false,gap:0,last:0,best:999,pen:0,pos:i+1}));
+  live={lap:0,laps:CAL[s.event][3],risk,field:f,events:["🟢 Starten går!"],finished:false,decision:null,sc:0};
+  s.session="live";
+  advanceV5(1);
+}
+function incidentChance(x){return .0025+(s.weather==="Regn"?.004:0)+(live.risk*.0015)+(x.trait==="Aggressiv"?.0015:0)}
+function lapTime(x){
+  let base=72-(x.skill||70)*.075-(x.cls==="Modified"?2.15:0);
+  if(s.weather==="Regn") base+=7.5;
+  let tyre=(100-s.tires[0])*.012, wear=x.you?(100-(s.parts.brakes+s.parts.suspension+s.parts.drivetrain)/3)*.008:0;
+  let noise=(Math.random()-.5)*1.05;
+  return base+tyre+wear+noise-(x.you?live.risk*.12:0);
+}
+function sortTiming(){
+  live.field.sort((a,b)=>{
+    if(a.dnf!==b.dnf)return a.dnf?1:-1;
+    return b.score-a.score;
+  });
+  let lead=live.field.find(x=>!x.dnf)?.score||0;
+  live.field.forEach((x,i)=>{x.pos=i+1;x.gap=x.dnf?999:Math.max(0,(lead-x.score)*.48)});
+}
+function maybeDecision(){
+  let me=live.field.find(x=>x.you); if(!me||me.dnf||live.finished||live.decision)return;
+  let i=live.field.indexOf(me), ahead=live.field[i-1], behind=live.field[i+1];
+  if(ahead&&!ahead.dnf&&Math.abs(ahead.score-me.score)<2.2&&Math.random()<.48)
+    live.decision={type:"attack",other:ahead.n,text:`Du är inom slagläge på ${ahead.n}.`};
+  else if(behind&&!behind.dnf&&Math.abs(behind.score-me.score)<2.0&&Math.random()<.34)
+    live.decision={type:"defend",other:behind.n,text:`${behind.n} fyller backspeglarna.`};
+  else if(s.parts.brakes<48&&Math.random()<.28)
+    live.decision={type:"mechanical",other:null,text:"Bromspedalen känns längre än tidigare."};
+}
+function advanceV5(n=3){
+  if(!live||live.finished||live.decision)return;
+  for(let z=0;z<n&&live.lap<live.laps;z++){
+    live.lap++;
+    if(!live.sc && Math.random()<.025 && live.lap>2 && live.lap<live.laps-2){live.sc=2;live.events.unshift(`🟡 Varv ${live.lap}: Safety Car efter en incident längre bak.`)}
+    for(let x of live.field){
+      if(x.dnf)continue;
+      x.last=lapTime(x);x.best=Math.min(x.best,x.last);
+      let gain=(74-x.last)*.20+(Math.random()-.5)*.55;
+      if(live.sc) gain*=.15;
+      x.score+=gain;
+      if(!x.you&&Math.random()<incidentChance(x)){
+        if(Math.random()<.38){x.dnf=true;live.events.unshift(`Varv ${live.lap}: ${x.n} står vid sidan av banan. DNF.`)}
+        else {x.score-=2.5;live.events.unshift(`Varv ${live.lap}: ${x.n} gör ett misstag och tappar.`)}
+      }
+    }
+    let me=live.field.find(x=>x.you);
+    if(me&&!me.dnf){
+      let fail=.002+live.risk*.0025+(s.weather==="Regn"?.003:0)+(100-s.parts.drivetrain)*.00005;
+      if(Math.random()<fail){me.dnf=true;s.stats.dnf++;live.events.unshift(`🔧 Varv ${live.lap}: Du tvingas bryta med tekniskt problem.`)}
+    }
+    if(live.sc){live.sc--; if(!live.sc)live.events.unshift(`🟢 Varv ${live.lap}: Safety Car in. Grön flagg!`)}
+    sortTiming(); maybeDecision(); if(live.decision)break;
+  }
+  if(live.lap>=live.laps&&!live.finished){live.finished=true;finishRace();v5PostRace()}
+  liveViewV5();
+}
+function chooseV5(kind){
+  let d=live.decision,me=live.field.find(x=>x.you),i=live.field.indexOf(me),other=d.type==="attack"?live.field[i-1]:live.field[i+1];
+  s.v5.decisions++;
+  if(d.type==="attack"){
+    let chance={wait:.18,normal:.48,hard:.68}[kind]||.4;
+    chance+=(s.driver-70)*.006-(other.skill-75)*.004;
+    if(Math.random()<chance){me.score+=2.4;live.events.unshift(`⚔️ Varv ${live.lap}: Du tar dig förbi ${d.other}!`)}
+    else if(kind==="hard"&&Math.random()<.28){me.score-=3;s.parts.body=Math.max(20,s.parts.body-7);s.stats.incidents++;live.events.unshift(`💥 Kontakt med ${d.other}! Båda tappar tid.`);relationHit(d.other)}
+    else live.events.unshift(`Varv ${live.lap}: ${d.other} håller dig bakom.`)
+  }else if(d.type==="defend"){
+    let chance={yield:.25,normal:.58,hard:.76}[kind]||.5;
+    if(Math.random()<chance){me.score+=.8;live.events.unshift(`🛡️ Du håller ${d.other} bakom dig.`)}
+    else {me.score-=2;live.events.unshift(`${d.other} tar sig förbi.`)}
+    if(kind==="hard"&&Math.random()<.18){me.pen+=5;s.v5.penalties++;live.events.unshift(`⚖️ Race Control: +5 sekunder för oschysst försvar.`)}
+  }else{
+    if(kind==="pit"){me.score-=7;s.parts.brakes=Math.min(100,s.parts.brakes+10);live.events.unshift("🔧 Kort depåbesök. Du tappar platser men säkrar bromsarna.")}
+    else if(kind==="slow"){live.risk=0;live.events.unshift("Du sänker tempot för att få bilen i mål.")}
+    else {live.risk=2;live.events.unshift("Du fortsätter. Förhoppningsvis håller det.")}
+  }
+  live.decision=null;sortTiming();liveViewV5();
+}
+function relationHit(name){let v=s.relations[name];if(typeof v!=="number")v=0;s.relations[name]=v-1;s.log.unshift(`Det blev spänt mellan dig och ${name} efter kontakten.`)}
+function fmt(t){if(!isFinite(t)||t>=999)return "—";let m=Math.floor(t/60),sec=(t-m*60).toFixed(3).padStart(6,"0");return `${m}:${sec}`}
+function liveViewV5(){
+  let f=live.field,me=f.find(x=>x.you),active=f.filter(x=>!x.dnf),classActive=active.filter(x=>x.cls===s.cls),cp=me.dnf?"DNF":classActive.indexOf(me)+1;
+  let dec="";
+  if(live.decision){
+    let d=live.decision;
+    if(d.type==="attack")dec=`<div class="decision"><h2>⚔️ Chans till omkörning</h2><p>${d.text}</p><div class="controls"><button class="btn" onclick="chooseV5('wait')">Avvakta</button><button class="btn primary" onclick="chooseV5('normal')">Försök</button><button class="btn" onclick="chooseV5('hard')">Kasta in bilen</button></div></div>`;
+    if(d.type==="defend")dec=`<div class="decision"><h2>🛡️ Försvara positionen</h2><p>${d.text}</p><div class="controls"><button class="btn" onclick="chooseV5('yield')">Tänk på racet</button><button class="btn primary" onclick="chooseV5('normal')">Försvara</button><button class="btn" onclick="chooseV5('hard')">Stäng dörren</button></div></div>`;
+    if(d.type==="mechanical")dec=`<div class="decision"><h2>🔧 Mekanisk varning</h2><p>${d.text}</p><div class="controls"><button class="btn" onclick="chooseV5('pit')">Depå</button><button class="btn primary" onclick="chooseV5('slow')">Sänk tempot</button><button class="btn" onclick="chooseV5('push')">Fortsätt attackera</button></div></div>`;
+  }
+  main.innerHTML=`<section class="hero"><span class="badge red">LIVE • VARV ${live.lap}/${live.laps}</span><h1>${me.dnf?"DNF":`P${me.pos} totalt • P${cp} ${s.cls}`}</h1><p><span class="flag ${live.sc?'yellow':'green'}">${live.sc?"● SAFETY CAR":"● GRÖN FLAGG"}</span> • ${s.weather} • Däck ${Math.round(s.tires[0])}%</p>${dec}<div class="controls">${!live.finished&&!live.decision?`<button class="btn primary" onclick="advanceV5(3)">Kör 3 varv</button><button class="btn" onclick="advanceV5(1)">Kör 1 varv</button>`:""}${live.finished?`<button class="btn primary" onclick="s.session='result';render()">Resultat</button>`:""}</div></section>
+  <div class="grid"><div class="card span8"><h2>Live timing</h2><table><tr><th>P</th><th>Förare</th><th>Klass</th><th>Gap</th><th>Senaste</th><th>Bästa</th></tr>${f.map(x=>`<tr class="${x.you?'you':''}"><td>${x.dnf?"DNF":x.pos}</td><td>${x.n}</td><td>${x.cls==="Modified"?"M":"S"}</td><td class="livegap">${x.dnf?"—":x.pos===1?"LEADER":"+"+x.gap.toFixed(1)}</td><td>${fmt(x.last)}</td><td>${fmt(x.best)}</td></tr>`).join("")}</table></div><div class="card span4"><h2>Race Control</h2>${live.events.slice(0,9).map(x=>`<div class="event ${x.includes("💥")||x.includes("DNF")?"hot":""}">${x}</div>`).join("")}</div></div>`;
+  save();
+}
+function v5PostRace(){
+  let me=live.field.find(x=>x.you); if(!me)return;
+  if(me.pen){me.score-=me.pen*.16;sortTiming();live.events.unshift(`⚖️ ${me.pen} sekunders tidstillägg applicerat efter mål.`)}
+  let best=Math.min(...live.field.filter(x=>!x.dnf).map(x=>x.best));
+  if(me.best===best){s.v5.fastest++;s.log.unshift("Du satte racets snabbaste varv!")}
+  if(Math.random()<.45){let headlines=["Tätt i båda klasserna efter helgen.","Depåsnacket handlar om de små marginalerna.","Flera förare jagar revansch i nästa race.","Vädret fortsätter spela huvudroll i årets cup."];s.v5.news.unshift(headlines[Math.floor(Math.random()*headlines.length)])}
+}
+function racingWorldV5(){
+  let topS=Object.entries(s.champ.Standard||{}).sort((a,b)=>b[1]-a[1]).slice(0,3),topM=Object.entries(s.champ.Modified||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  main.innerHTML=`<section class="hero"><span class="badge red">RACINGVÄRLDEN</span><h1>Runt MX-5 Cup</h1><p>Resultat, depåsnack, rivaler och berättelser från säsongen.</p></section><div class="grid"><div class="card span6"><h2>Senaste nytt</h2><div class="newsgrid">${(s.v5.news.length?s.v5.news:["Säsongen laddar upp. Alla blickar är på nästa tävlingshelg.","Standard och Modified delar asfalt – men inte mästerskap."]).slice(0,6).map(n=>`<div class="event">${n}</div>`).join("")}</div></div><div class="card span6"><h2>Din berättelse</h2><div class="row"><span>Racebeslut</span><b>${s.v5.decisions}</b></div><div class="row"><span>Straff</span><b>${s.v5.penalties}</b></div><div class="row"><span>Snabbaste varv</span><b>${s.v5.fastest}</b></div><div class="row"><span>Incidenter</span><b>${s.stats.incidents}</b></div></div><div class="card span6"><h2>Standard topp 3</h2>${topS.length?topS.map((x,i)=>`<div class="row"><span>${i+1}. ${x[0]}</span><b>${x[1]}</b></div>`).join(""):"<p class='muted'>Inga race körda ännu.</p>"}</div><div class="card span6"><h2>Modified topp 3</h2>${topM.length?topM.map((x,i)=>`<div class="row"><span>${i+1}. ${x[0]}</span><b>${x[1]}</b></div>`).join(""):"<p class='muted'>Inga race körda ännu.</p>"}</div></div>`;
+}
+// Hook v0.8 into existing game without breaking old saves.
+const _oldNavR=navR; navR=function(){_oldNavR();nav.innerHTML+=`<button class="${tab==='world'?'active':''}" onclick="tab='world';racingWorldV5()">Racingvärlden</button>`}
+const _oldRender=render; render=function(){migrateV5();if(tab==="world"){date.textContent=`${s.season||2027} • Racingvärlden`;navR();racingWorldV5();save();return}_oldRender()}
+const _oldStartRace=startRace; startRace=function(risk){makeLiveV5(risk)}
+const _oldLiveView=liveView; liveView=function(){liveViewV5()}
+
+
+// ---- v0.8: clearer class gap + tactical race decisions ----
+function raceStrategyBox(){
+  if(!live||live.finished)return "";
+  let me=live.field.find(x=>x.you); if(!me||me.dnf)return "";
+  let label=live.risk===0?"Spara bilen":live.risk===2?"Attack":"Normalt tempo";
+  return `<div class="decision"><h2>🎛️ Raceplan</h2>
+  <p>Nuvarande: <b>${label}</b>. Du kan ändra planen när som helst under racet.</p>
+  <div class="controls">
+    <button class="btn ${live.risk===0?'good':''}" onclick="setRacePlan(0)">Spara bilen</button>
+    <button class="btn ${live.risk===1?'good':''}" onclick="setRacePlan(1)">Normalt tempo</button>
+    <button class="btn ${live.risk===2?'good':''}" onclick="setRacePlan(2)">Attack</button>
+  </div>
+  <div class="controls">
+    <button class="btn smallbtn" onclick="raceAction('cool')">Kyl bromsarna</button>
+    <button class="btn smallbtn" onclick="raceAction('tyres')">Skona däcken</button>
+    <button class="btn smallbtn" onclick="raceAction('pushlap')">Push-varv</button>
+  </div></div>`;
+}
+function setRacePlan(r){live.risk=r;live.events.unshift(`🎛️ Varv ${live.lap}: Raceplan ändrad till ${r===0?"spara bilen":r===2?"attack":"normalt tempo"}.`);liveViewV6()}
+function raceAction(a){
+  let me=live.field.find(x=>x.you); if(!me||me.dnf)return;
+  if(a==="cool"){live.risk=0;s.parts.brakes=Math.min(100,s.parts.brakes+1.5);me.score-=.25;live.events.unshift(`🧊 Varv ${live.lap}: Du ger bromsarna lite luft och tappar några tiondelar.`)}
+  if(a==="tyres"){live.risk=0;s.tires[0]=Math.min(100,s.tires[0]+1);me.score-=.18;live.events.unshift(`🛞 Varv ${live.lap}: Du skonar däcken genom de snabba partierna.`)}
+  if(a==="pushlap"){live.risk=2;me.score+=.45;s.tires[0]=Math.max(0,s.tires[0]-1.5);s.parts.brakes=Math.max(20,s.parts.brakes-1);live.events.unshift(`🔥 Varv ${live.lap}: PUSH! Du satsar på ett riktigt snabbt varv.`)}
+  s.v5.decisions++;sortTiming();liveViewV6();
+}
+function liveViewV6(){
+  let f=live.field,me=f.find(x=>x.you),active=f.filter(x=>!x.dnf),classActive=active.filter(x=>x.cls===s.cls),cp=me.dnf?"DNF":classActive.indexOf(me)+1;
+  let dec="";
+  if(live.decision){
+    let d=live.decision;
+    if(d.type==="attack")dec=`<div class="decision"><h2>⚔️ Chans till omkörning</h2><p>${d.text}</p><div class="controls"><button class="btn" onclick="chooseV5('wait')">Avvakta</button><button class="btn primary" onclick="chooseV5('normal')">Förbered och försök</button><button class="btn" onclick="chooseV5('hard')">Sen inbromsning</button></div></div>`;
+    if(d.type==="defend")dec=`<div class="decision"><h2>🛡️ Attack bakifrån</h2><p>${d.text}</p><div class="controls"><button class="btn" onclick="chooseV5('yield')">Tänk på klassen</button><button class="btn primary" onclick="chooseV5('normal')">Försvara normalt</button><button class="btn" onclick="chooseV5('hard')">Stäng dörren</button></div></div>`;
+    if(d.type==="mechanical")dec=`<div class="decision"><h2>🔧 Mekanisk varning</h2><p>${d.text}</p><div class="controls"><button class="btn" onclick="chooseV5('pit')">Gå i depå</button><button class="btn primary" onclick="chooseV5('slow')">Sänk tempot</button><button class="btn" onclick="chooseV5('push')">Chansa och fortsätt</button></div></div>`;
+  }
+  main.innerHTML=`<section class="hero"><span class="badge red">LIVE • VARV ${live.lap}/${live.laps}</span><h1>${me.dnf?"DNF":`P${me.pos} totalt • P${cp} ${s.cls}`}</h1>
+  <p><span class="flag ${live.sc?'yellow':'green'}">${live.sc?"● SAFETY CAR":"● GRÖN FLAGG"}</span> • ${s.weather} • Däck ${Math.round(s.tires[0])}%</p>
+  ${dec}${!live.decision?raceStrategyBox():""}
+  <div class="controls">${!live.finished&&!live.decision?`<button class="btn primary" onclick="advanceV5(1)">Kör nästa varv</button><button class="btn" onclick="advanceV5(3)">Kör 3 varv</button>`:""}${live.finished?`<button class="btn primary" onclick="s.session='result';render()">Resultat</button>`:""}</div></section>
+  <div class="grid"><div class="card span8"><h2>Live timing</h2><table><tr><th>P</th><th>Förare</th><th>Klass</th><th>Gap</th><th>Senaste</th><th>Bästa</th></tr>${f.map(x=>`<tr class="${x.you?'you':''}"><td>${x.dnf?"DNF":x.pos}</td><td>${x.n}</td><td>${x.cls==="Modified"?"M":"S"}</td><td class="livegap">${x.dnf?"—":x.pos===1?"LEADER":"+"+x.gap.toFixed(1)}</td><td>${fmt(x.last)}</td><td>${fmt(x.best)}</td></tr>`).join("")}</table></div>
+  <div class="card span4"><h2>Race Control</h2>${live.events.slice(0,10).map(x=>`<div class="event ${x.includes("💥")||x.includes("DNF")?"hot":""}">${x}</div>`).join("")}</div></div>`;save();
+}
+// Make cross-class overtakes harder for Standard and more plausible for Modified.
+const _chooseV5v6=chooseV5;
+chooseV5=function(kind){
+  if(live?.decision?.type==="attack"){
+    let me=live.field.find(x=>x.you),i=live.field.indexOf(me),other=live.field[i-1];
+    if(me&&other&&me.cls==="Standard"&&other.cls==="Modified"&&kind!=="wait"){
+      if(Math.random()<.68){live.events.unshift(`⚡ ${other.n}s Modified har för mycket fart ut ur kurvan. Du får släppa försöket.`);live.decision=null;me.score-=.25;liveViewV6();return;}
+    }
+  }
+  _chooseV5v6(kind); if(live&&s.session==="live")liveViewV6();
+}
+liveViewV5=liveViewV6;
+liveView=liveViewV6;
+
+
+// ---- v0.8: tyre selection, meaningful practice/setup, rotating calendars ----
+const TRACK_POOL=[
+["Anderstorp","Snabb • stabilitet viktig",16,{bal:52,press:49,key:"stabilitet"}],
+["Rudskogen","Flyt • mod belönas",15,{bal:50,press:51,key:"flyt"}],
+["Ring Knutstorp","Teknisk • svårt att köra om",17,{bal:47,press:48,key:"rotation"}],
+["Mantorp Park","Motor • bromsar • omkörning",16,{bal:51,press:50,key:"bromsbalans"}],
+["Falkenberg","Snabb • rytm • små marginaler",16,{bal:53,press:51,key:"högfartsbalans"}],
+["Gelleråsen","Blandad • hårda inbromsningar",16,{bal:49,press:49,key:"inbromsning"}],
+["Kinnekulle","Kuperad • teknisk • mod",15,{bal:48,press:47,key:"grepp"}],
+["Sturup Raceway","Kort • teknisk • intensiv",18,{bal:46,press:49,key:"rotation"}]
+];
+function ensureV7(){
+ s.v7=s.v7||{}; s.v7.activeTyre=s.v7.activeTyre||0;s.v7.practiceRuns=s.v7.practiceRuns||0;s.v7.knowledge=s.v7.knowledge||0;s.v7.feedback=s.v7.feedback||"Ingen data ännu.";
+ if(!s.v7.calendar||!s.v7.calendar.length) s.v7.calendar=TRACK_POOL.slice(0,4).map((t,i)=>[t[0],CAL[i]?.[1]||["1–3 maj","12–14 juni","3–5 juli","28–30 augusti"][i],t[1],t[2],t[3]]);
+}
+function currentCal(){ensureV7();return s.v7.calendar}
+function activeTyre(){ensureV7();return s.tires[s.v7.activeTyre]??0}
+function tyreSelector(){
+ return `<div class="card"><h2>🛞 Välj däckset</h2>${s.tires.map((x,i)=>`<div class="row"><span>Set ${String.fromCharCode(65+i)} ${i===s.v7.activeTyre?"• MONTERAT":""}</span><b>${Math.round(x)}% <button class="btn smallbtn" ${i===s.v7.activeTyre?"disabled":""} onclick="selectTyre(${i})">Montera</button></b></div>${bar(x)}`).join("")}</div>`;
+}
+function selectTyre(i){s.v7.activeTyre=i;s.log.unshift(`Däckset ${String.fromCharCode(65+i)} monterat.`);render()}
+function trackData(){let name=currentCal()[s.event]?.[0];return TRACK_POOL.find(x=>x[0]===name)||TRACK_POOL[0]}
+function setupScore(){
+ let t=trackData()[4], knowledge=s.v7.knowledge||0;
+ let db=Math.abs(s.setup.balance-t.bal),dp=Math.abs(s.setup.pressure-t.press);
+ return clamp(100-db*8-dp*7+knowledge*.12,0,100);
+}
+function setupFeedback(){
+ let t=trackData()[4],k=s.v7.knowledge;
+ if(k<20)return "Bilen känns okej, men du har för lite data för att säga vad som behöver ändras.";
+ let bits=[];
+ let bd=s.setup.balance-t.bal,pd=s.setup.pressure-t.press;
+ if(Math.abs(bd)<=1)bits.push("balansen känns nära rätt");
+ else bits.push(bd<t.bal?"bilen vill inte riktigt rotera in i kurvan":"bakvagnen känns lite för livlig");
+ if(k>=45){if(Math.abs(pd)<=1)bits.push("däcktrycket verkar ligga bra");else bits.push(pd<t.press?"däcken känns lite tröga att komma igång":"greppet faller av när däcken blir varma")}
+ if(k>=70)bits.push(`data pekar mot ungefär balans ${t.bal} och tryck ${t.press}`);
+ return bits.join(". ")+".";
+}
+function practiceRun(){
+ if(s.v7.practiceRuns>=4)return alert("Träningspassen är slut.");
+ let tyre=activeTyre(); if(tyre<8)return alert("Det monterade däcksetet är för slitet.");
+ s.v7.practiceRuns++;s.v7.knowledge=clamp(s.v7.knowledge+22+(s.driver-65)*.18,0,100);
+ s.tires[s.v7.activeTyre]=Math.max(0,tyre-4);
+ s.parts.brakes=Math.max(20,s.parts.brakes-1);
+ s.v7.feedback=setupFeedback();
+ s.confidence=clamp(s.confidence+1,0,100);
+ practiceV7();
+}
+function adjustSetup(k,d){s.setup[k]=clamp(s.setup[k]+d,35,65);s.v7.feedback=setupFeedback();practiceV7()}
+function practiceV7(){
+ let t=trackData(),score=Math.round(setupScore()), runs=s.v7.practiceRuns;
+ main.innerHTML=`<section class="hero"><span class="badge red">${currentCal()[s.event][0]} • TRÄNING</span><h1>Bygg upp bilen, inte bara varvtiden</h1><p>${s.weather==="Regn"?"🌧️":"☀️"} ${s.weather} • Pass ${runs}/4 • Bankännedom ${Math.round(s.v7.knowledge)}%</p></section>
+ <div class="grid"><div class="card span7"><h2>Förarfeedback</h2><div class="event">${s.v7.feedback}</div>
+ <h2 style="margin-top:18px">Setup</h2>
+ <div class="row"><span>Balans</span><b>${s.setup.balance}</b></div><div class="controls"><button class="btn" onclick="adjustSetup('balance',-1)">← Mer stabil fram</button><button class="btn" onclick="adjustSetup('balance',1)">Mer rotation →</button></div>
+ <div class="row"><span>Däcktryck</span><b>${s.setup.pressure}</b></div><div class="controls"><button class="btn" onclick="adjustSetup('pressure',-1)">− Tryck</button><button class="btn" onclick="adjustSetup('pressure',1)">+ Tryck</button></div>
+ <div class="row"><span>Setup-förtroende</span><b>${runs?score+"%":"?"}</b></div>${runs?bar(score):""}
+ <p class="muted">Bra setup ger några tiondelar och en mer förutsägbar bil. Ju fler träningspass du kör, desto mer exakt blir feedbacken.</p>
+ <div class="controls"><button class="btn primary" onclick="practiceRun()">Kör träningspass</button><button class="btn good" onclick="s.session='qual';render()">Till kval</button></div></div>
+ <div class="span5">${tyreSelector()}<div class="card" style="margin-top:12px"><h2>Banans krav</h2><p>${t[1]}</p><p class="muted">Nyckel: ${t[4].key}. Exakta idealvärden avslöjas först när du samlat tillräckligt med data.</p></div></div></div>`;save();
+}
+function generateCalendarV7(season){
+ let mandatory=season===2027?TRACK_POOL.slice(0,4):[];
+ if(mandatory.length)return mandatory.map((t,i)=>[t[0],["1–3 maj","12–14 juni","3–5 juli","28–30 augusti"][i],t[1],t[2],t[4]]);
+ let pool=[...TRACK_POOL].sort(()=>Math.random()-.5),count=Math.random()<.35?3:4,dates=["8–10 maj","12–14 juni","10–12 juli","28–30 augusti"];
+ return pool.slice(0,count).map((t,i)=>[t[0],dates[i],t[1],t[2],t[4]]);
+}
+function calendarV7(){
+ let c=currentCal();
+ main.innerHTML=`<h1>Kalender ${s.season||2027}</h1><p class="muted">Cupen besöker 3–4 banor per säsong. Kalendern kan förändras mellan åren.</p><div class="grid">${c.map((x,i)=>`<div class="card span6"><span class="badge">2 race</span><h2 style="margin-top:10px">${x[0]}</h2><div class="row"><span>Datum</span><b>${x[1]}</b></div><div class="row"><span>Karaktär</span><b>${x[2]}</b></div><div class="row"><span>Status</span><b>${i<s.event?"Körd":i===s.event?"Nästa":"Kommande"}</b></div></div>`).join("")}</div>`;
+}
+ensureV7();
+// Make setup matter in performance: max ~4 points; bad blind setup can cost pace.
+const _paceV7=pace; pace=function(x,spread=8){let p=_paceV7(x,spread);if(x.you)p+=(setupScore()-70)*.055;return p}
+const _raceBaseV7=raceBase; raceBase=function(x){let p=_raceBaseV7(x);if(x.you)p+=(setupScore()-70)*.05;return p}
+// Route practice/calendar to v0.8.
+practice=practiceV7; cal=calendarV7;
+// Use selected tyre everywhere old engine assumed set 0.
+const _oldLapTimeV7=lapTime;lapTime=function(x){let old=s.tires[0],idx=s.v7.activeTyre;s.tires[0]=s.tires[idx];let r=_oldLapTimeV7(x);s.tires[0]=old;return r}
+const _oldFinishRaceV7=finishRace;finishRace=function(){let idx=s.v7.activeTyre,old0=s.tires[0];if(idx!==0)s.tires[0]=s.tires[idx];_oldFinishRaceV7();if(idx!==0){s.tires[idx]=s.tires[0];s.tires[0]=old0}}
+const _oldEnterV7=enter;enter=function(){s.v7.practiceRuns=0;s.v7.knowledge=0;s.v7.feedback="Ingen data ännu.";_oldEnterV7()}
+const _oldFinishEventV7=finishEvent;finishEvent=function(){_oldFinishEventV7();s.v7.practiceRuns=0;s.v7.knowledge=0}
+// Rotate future seasons.
+const _oldNewSeasonV7=newSeason;newSeason=function(){_oldNewSeasonV7();s.v7.calendar=generateCalendarV7(s.season||2028);s.event=0;render()}
+
+
+// ---- v0.8: new game / reset controls ----
+function confirmNewGame(){
+  if(!confirm("Starta ett helt nytt spel? Din nuvarande sparfil på den här enheten kommer att ersättas.")) return;
+  try{
+    ["mx5cm_save","mx5cm_save_v02","mx5cm_save_v03","mx5cm_save_v04","mx5cm_save_v05","mx5cm_save_v06","mx5cm_save_v07","mx5cm_save_v08"].forEach(k=>localStorage.removeItem(k));
+  }catch(e){}
+  s=fresh();
+  s.v5={news:[],racecraft:50,wet:50,decisions:0,penalties:0,fastest:0};
+  s.v7={activeTyre:0,practiceRuns:0,knowledge:0,feedback:"Ingen data ännu.",calendar:generateCalendarV7(2027)};
+  tab="start"; live=null; save(); render();
+}
+function newGameButton(){
+  return `<button class="btn" style="margin-left:auto" onclick="confirmNewGame()">↻ Nytt spel</button>`;
+}
+const _navRV8=navR;
+navR=function(){_navRV8();nav.innerHTML+=newGameButton()}
+
 render();
 </script></body></html>
