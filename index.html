@@ -55,7 +55,7 @@ const m=n=>n.toLocaleString("sv-SE")+" kr", clamp=(v,a,b)=>Math.max(a,Math.min(b
 function bar(v){return `<div class="bar"><i style="width:${clamp(v,0,100)}%"></i></div>`}
 function navR(){let a=[["garage","Garage"],["calendar","Kalender"],["drivers","Förare"],["championship","Mästerskap"],["economy","Ekonomi"],["stats","Statistik"],["world","Racingvärlden"]];nav.innerHTML=a.map(x=>`<button class="${tab==x[0]?'active':''}" onclick="tab='${x[0]}';render()">${x[1]}</button>`).join("")}
 function render(){date.textContent=s.started?`${s.season||2027} • ${s.event<4?CAL[s.event][0]:"Säsongen klar"}`:"Ny karriär";if(!s.started){nav.innerHTML="";return start()}navR();({garage,calendar:cal,drivers:driverPage,championship:champ,economy:econ,stats:statsPage,world:worldPage,week:weekPage,raceWeekend})[tab]?.();save()}
-function start(){main.innerHTML=`<section class="hero"><span class="badge red">v1.1 • RACINGVÄRLDEN</span><h1 style="margin-top:12px">MX-5 Cup Manager</h1><p>Nu med en levande racingvärld: rivaliteter, depånyheter, AI-form, marknad, vinterbeslut och fler konsekvenser mellan tävlingarna.</p></section><div class="grid"><div class="card span6"><h2>Din förare</h2><input id="pn" value="Jakob"><br><br><input id="tn" value="Jakob Racing"></div><div class="card span6"><h2>Välj klass</h2><div class="choice"><button onclick="begin('Standard')"><strong>Standard Cup</strong><span class="muted">Den naturliga vägen in.</span></button><button onclick="begin('Modified')"><strong>Modified Cup</strong><span class="muted">Snabbare och dyrare.</span></button></div></div></div>`}
+function start(){main.innerHTML=`<section class="hero"><span class="badge red">v2.0 • RACINGVÄRLDEN</span><h1 style="margin-top:12px">MX-5 Cup Manager</h1><p>Nu med en levande racingvärld: rivaliteter, depånyheter, AI-form, marknad, vinterbeslut och fler konsekvenser mellan tävlingarna.</p></section><div class="grid"><div class="card span6"><h2>Din förare</h2><input id="pn" value="Jakob"><br><br><input id="tn" value="Jakob Racing"></div><div class="card span6"><h2>Välj klass</h2><div class="choice"><button onclick="begin('Standard')"><strong>Standard Cup</strong><span class="muted">Den naturliga vägen in.</span></button><button onclick="begin('Modified')"><strong>Modified Cup</strong><span class="muted">Snabbare och dyrare.</span></button></div></div></div>`}
 function begin(c){s=fresh();s.started=true;s.name=pn.value||"Jakob";s.team=tn.value||"Jakob Racing";s.cls=c;if(c==="Modified"){s.cash=210000;s.driver=70;s.car.motor=88;s.car.chassis=88}s.log.unshift("Satsningen är igång.");tab="garage";render()}
 function cp(n){return s.champ[s.cls][n]||0}
 function garage(){let ev=CAL[s.event],ready=s.membership&&s.license&&s.safety;
@@ -108,7 +108,7 @@ function worldPage(){let rivals=Object.entries(s.rivals).sort((a,b)=>b[1]-a[1]).
 function winterChoice(c){if(c==='modified'){let cost=65000;if(s.cash<cost)return alert('Du behöver 65 000 kr i racingbudgeten för att bygga om/ta steget till Modified.');s.cash-=cost;s.stats.costs+=cost;s.cls='Modified';s.car.motor=Math.max(s.car.motor,88);s.car.chassis=Math.max(s.car.chassis,88);s.log.unshift('Stort beslut: teamet tar steget till Modified Cup.')}else{s.car.condition=clamp(s.car.condition+5,0,100);s.log.unshift(`Du fortsätter i ${s.cls} och bygger vidare på det du har.`)}newSeason()}
 function newSeason(){s.season++;s.event=0;s.week=0;s.champ={Standard:{},Modified:{}};s.entered=false;s.activities=3;s.history=[];s.stats.starts=0;s.stats.wins=0;s.stats.podiums=0;s.stats.poles=0;s.stats.dnf=0;s.stats.best=99;s.stats.modifiedBeaten=0;s.stats.incidents=0;s.news.unshift(`Säsongen ${s.season} är igång. Nya förväntningar i depån.`);tab="garage";render()}
 
-// ---- v1.1 race depth / migration ----
+// ---- v2.0 race depth / migration ----
 function migrateV5(){
   s.v5=s.v5||{};
   s.v5.news=s.v5.news||[];
@@ -232,14 +232,14 @@ function racingWorldV5(){
   let topS=Object.entries(s.champ.Standard||{}).sort((a,b)=>b[1]-a[1]).slice(0,3),topM=Object.entries(s.champ.Modified||{}).sort((a,b)=>b[1]-a[1]).slice(0,3);
   main.innerHTML=`<section class="hero"><span class="badge red">RACINGVÄRLDEN</span><h1>Runt MX-5 Cup</h1><p>Resultat, depåsnack, rivaler och berättelser från säsongen.</p></section><div class="grid"><div class="card span6"><h2>Senaste nytt</h2><div class="newsgrid">${(s.v5.news.length?s.v5.news:["Säsongen laddar upp. Alla blickar är på nästa tävlingshelg.","Standard och Modified delar asfalt – men inte mästerskap."]).slice(0,6).map(n=>`<div class="event">${n}</div>`).join("")}</div></div><div class="card span6"><h2>Din berättelse</h2><div class="row"><span>Racebeslut</span><b>${s.v5.decisions}</b></div><div class="row"><span>Straff</span><b>${s.v5.penalties}</b></div><div class="row"><span>Snabbaste varv</span><b>${s.v5.fastest}</b></div><div class="row"><span>Incidenter</span><b>${s.stats.incidents}</b></div></div><div class="card span6"><h2>Standard topp 3</h2>${topS.length?topS.map((x,i)=>`<div class="row"><span>${i+1}. ${x[0]}</span><b>${x[1]}</b></div>`).join(""):"<p class='muted'>Inga race körda ännu.</p>"}</div><div class="card span6"><h2>Modified topp 3</h2>${topM.length?topM.map((x,i)=>`<div class="row"><span>${i+1}. ${x[0]}</span><b>${x[1]}</b></div>`).join(""):"<p class='muted'>Inga race körda ännu.</p>"}</div></div>`;
 }
-// Hook v1.1 into existing game without breaking old saves.
+// Hook v2.0 into existing game without breaking old saves.
 const _oldNavR=navR; navR=function(){_oldNavR();nav.innerHTML+=`<button class="${tab==='world'?'active':''}" onclick="tab='world';racingWorldV5()">Racingvärlden</button>`}
 const _oldRender=render; render=function(){migrateV5();if(tab==="world"){date.textContent=`${s.season||2027} • Racingvärlden`;navR();racingWorldV5();save();return}_oldRender()}
 const _oldStartRace=startRace; startRace=function(risk){makeLiveV5(risk)}
 const _oldLiveView=liveView; liveView=function(){liveViewV5()}
 
 
-// ---- v1.1: clearer class gap + tactical race decisions ----
+// ---- v2.0: clearer class gap + tactical race decisions ----
 function raceStrategyBox(){
   if(!live||live.finished)return "";
   let me=live.field.find(x=>x.you); if(!me||me.dnf)return "";
@@ -296,7 +296,7 @@ liveViewV5=liveViewV6;
 liveView=liveViewV6;
 
 
-// ---- v1.1: tyre selection, meaningful practice/setup, rotating calendars ----
+// ---- v2.0: tyre selection, meaningful practice/setup, rotating calendars ----
 const TRACK_POOL=[
 ["Anderstorp","Snabb • stabilitet viktig",16,{bal:52,press:49,key:"stabilitet"}],
 ["Rudskogen","Flyt • mod belönas",15,{bal:50,press:51,key:"flyt"}],
@@ -371,7 +371,7 @@ ensureV7();
 // Make setup matter in performance: max ~4 points; bad blind setup can cost pace.
 const _paceV7=pace; pace=function(x,spread=8){let p=_paceV7(x,spread);if(x.you)p+=(setupScore()-70)*.055;return p}
 const _raceBaseV7=raceBase; raceBase=function(x){let p=_raceBaseV7(x);if(x.you)p+=(setupScore()-70)*.05;return p}
-// Route practice/calendar to v1.1.
+// Route practice/calendar to v2.0.
 practice=practiceV7; cal=calendarV7;
 // Use selected tyre everywhere old engine assumed set 0.
 const _oldLapTimeV7=lapTime;lapTime=function(x){let old=s.tires[0],idx=s.v7.activeTyre;s.tires[0]=s.tires[idx];let r=_oldLapTimeV7(x);s.tires[0]=old;return r}
@@ -382,7 +382,7 @@ const _oldFinishEventV7=finishEvent;finishEvent=function(){_oldFinishEventV7();s
 const _oldNewSeasonV7=newSeason;newSeason=function(){_oldNewSeasonV7();s.v7.calendar=generateCalendarV7(s.season||2028);s.event=0;render()}
 
 
-// ---- v1.1: new game / reset controls ----
+// ---- v2.0: new game / reset controls ----
 function confirmNewGame(){
   if(!confirm("Starta ett helt nytt spel? Din nuvarande sparfil på den här enheten kommer att ersättas.")) return;
   try{
@@ -400,7 +400,7 @@ const _navRV8=navR;
 navR=function(){_navRV8();nav.innerHTML+=newGameButton()}
 
 
-// ---- v1.1 hotfix: v0.7 calendar is now used by garage/event flow ----
+// ---- v2.0 hotfix: v0.7 calendar is now used by garage/event flow ----
 function garageV9(){
  ensureV7();
  let ev=currentCal()[s.event],ready=s.membership&&s.license&&s.safety;
@@ -429,7 +429,7 @@ function goWeekendV9(){
 garage=garageV9;enter=enterV9;
 
 
-// ---- v1.1 critical race-weekend routing fix ----
+// ---- v2.0 critical race-weekend routing fix ----
 function raceWeekendV10(){
   ensureV7();
   if(!s.session)s.session="practice";
@@ -466,7 +466,7 @@ raceWeekend=raceWeekendV10;
 goWeekendV9=goWeekendV10;
 
 
-// ---- v1.1: explicit weekend CTA; planning no longer blocks race entry ----
+// ---- v2.0: explicit weekend CTA; planning no longer blocks race entry ----
 function garageV11(){
  ensureV7();
  let ev=currentCal()[s.event], ready=s.membership&&s.license&&s.safety;
@@ -499,7 +499,7 @@ function enterV11(){
 garage=garageV11;garageV9=garageV11;enter=enterV11;enterV9=enterV11;
 
 
-// ---- v1.1: hard migration + self-contained race weekend ----
+// ---- v2.0: hard migration + self-contained race weekend ----
 function normalizeV12(){
  const d=fresh();
  for(const k of ["setup","car","parts","stats","champ"]) if(!s[k]||typeof s[k]!=="object") s[k]=JSON.parse(JSON.stringify(d[k]));
@@ -567,7 +567,7 @@ practice=practiceV12;practiceV7=practiceV12;raceWeekend=raceWeekendV12;raceWeeke
 normalizeV12();
 
 
-// ---- v1.1: self-contained qualifying, no legacy dependency ----
+// ---- v2.0: self-contained qualifying, no legacy dependency ----
 function qualV13(){
  normalizeV12();
  let ev=currentCal()[s.event]||currentCal()[0];
@@ -623,7 +623,7 @@ function raceWeekendV13(){
 raceWeekend=raceWeekendV13;raceWeekendV12=raceWeekendV13;raceWeekendV10=raceWeekendV13;
 
 
-// ---- v1.1 race-flow lock: direct state transitions, no legacy dispatcher between sessions ----
+// ---- v2.0 race-flow lock: direct state transitions, no legacy dispatcher between sessions ----
 function toQualV14(){
  normalizeV12();
  s.session="qual";
@@ -646,7 +646,7 @@ function raceFlowStatusV14(){
 }
 
 
-// ---- v1.1 minimal stable qualification fix ----
+// ---- v2.0 minimal stable qualification fix ----
 function toQualStable(){
   ensureV7();
   if(!s.setup)s.setup={balance:50,pressure:50};
@@ -658,7 +658,7 @@ toQualV14=toQualStable;
 toQualV12=toQualStable;
 
 
-// ==================== v1.1 CAREER + TIME BASED RACING ====================
+// ==================== v2.0 CAREER + TIME BASED RACING ====================
 function ensureV11(){
  s.v11=s.v11||{};
  if(!s.v11.carOwned){
@@ -848,6 +848,1134 @@ function annualPrivateV11(){
  return add;
 }
 ensureV11();
+
+
+// ==================== v2.0 CARS, UNIQUE AI, DECISIONS ====================
+const CAR_MARKET12=[
+ {id:"s1",name:"MX-5 NC Standard #14",cls:"Standard",price:72000,level:58,condition:68,potential:76,note:"Billig och ärlig instegsbil. Sliten men lätt att förstå."},
+ {id:"s2",name:"MX-5 NC Standard #48",cls:"Standard",price:94000,level:66,condition:82,potential:82,note:"Bra klubb-racer med vettig grundsetup."},
+ {id:"s3",name:"MX-5 NC Standard #91",cls:"Standard",price:121000,level:74,condition:93,potential:88,note:"Välbyggd Standardbil. Dyr, men tävlingsklar."},
+ {id:"s4",name:"MX-5 NC Standard #26",cls:"Standard",price:83000,level:63,condition:76,potential:90,note:"Ojämn bil med hög utvecklingspotential."},
+ {id:"m1",name:"MX-5 NC Modified #36",cls:"Modified",price:148000,level:72,condition:73,potential:84,note:"Äldre Modified. Snabb men kräver verkstadstid."},
+ {id:"m2",name:"MX-5 NC Modified #74",cls:"Modified",price:184000,level:80,condition:88,potential:91,note:"Stark och välbalanserad Modified."},
+ {id:"m3",name:"MX-5 NC Modified #11",cls:"Modified",price:219000,level:86,condition:95,potential:94,note:"Toppbil med få uppenbara svagheter."}
+];
+function aiProfile12(d,cls){
+ let seed=(+d[0]||d[1].length*7)+d[1].split("").reduce((a,c)=>a+c.charCodeAt(0),0);
+ let r=n=>((seed*n)%17)-8;
+ let ageCurve=seed%5;
+ return {pace:clamp(d[2]+r(3)*.25,60,96),racecraft:clamp(d[2]-3+r(5)*.35,55,95),qualifying:clamp(d[2]-2+r(7)*.3,55,96),wet:clamp(d[2]-5+r(11)*.55,45,96),consistency:clamp(d[2]-1+r(13)*.3,50,96),development:ageCurve===0?.05:ageCurve===1?.035:ageCurve===2?.022:.012,carLevel:clamp((cls==="Modified"?78:66)+(d[2]-78)*.45+r(2)*.35,52,92),carPotential:clamp((cls==="Modified"?91:86)+r(4)*.35,72,96)};
+}
+function ensureAI12(){
+ s.v12=s.v12||{};s.v12.ai=s.v12.ai||{};
+ for(let cls of ["Modified","Standard"])for(let d of D[cls]){
+   if(!s.v12.ai[d[1]])s.v12.ai[d[1]]=aiProfile12(d,cls);
+ }
+ s.v12.market=s.v12.market||CAR_MARKET12;
+ s.v12.carPurchased=s.v12.carPurchased??false;
+ // Existing careers get their current car converted rather than blocked.
+ if(s.stats?.starts>0||s.event>0||s.entered){
+   s.v12.carPurchased=true;
+   s.v11.carLevel=s.v11.carLevel||Math.round(s.cls==="Modified"?76:64);
+   s.v11.carPotential=s.v11.carPotential||Math.max(s.v11.carLevel+10,s.cls==="Modified"?88:84);
+   s.v11.carCondition=s.v11.carCondition||Math.round(s.car?.condition||88);
+ }
+}
+function buyCar12(id){
+ ensureV11();ensureAI12();let c=CAR_MARKET12.find(x=>x.id===id);if(!c)return;
+ let funds=s.cash+(s.privateCash||0);if(funds<c.price)return alert("Du har inte råd med den bilen.");
+ let fromPrivate=Math.max(0,c.price-s.cash);s.cash=Math.max(0,s.cash-c.price);s.privateCash=Math.max(0,(s.privateCash||0)-fromPrivate);
+ s.cls=c.cls;s.v12.carPurchased=true;s.v11.carName=c.name;s.v11.purchasePrice=c.price;s.v11.carLevel=c.level;s.v11.carPotential=c.potential;s.v11.carCondition=c.condition;
+ s.car.condition=c.condition;s.v11.upgrades={cooling:0,diff:0,brakes:0,suspension:0,data:0,weight:0};
+ s.log.unshift(`Du köpte ${c.name} för ${m(c.price)}.`);garageV12();
+}
+function carMarket12(){
+ ensureAI12();let funds=s.cash+(s.privateCash||0);
+ main.innerHTML=`<section class="hero"><span class="badge red">BILMARKNAD</span><h1>Köp din tävlingsbil</h1><p>Tillgängligt kapital: ${m(funds)}. Bilnivå sammanfattar hur konkurrenskraftig bilen är just nu. Potential är ungefär hur bra just det här exemplaret kan bli.</p></section>
+ <div class="grid">${CAR_MARKET12.map(c=>`<div class="card span6"><span class="badge">${c.cls}</span><h2>${c.name}</h2><p>${c.note}</p><div class="row"><span>Pris</span><b>${m(c.price)}</b></div><div class="row"><span>Bilnivå</span><b>${c.level}/100</b></div>${bar(c.level)}<div class="row"><span>Potential</span><b>${c.potential}/100</b></div><div class="row"><span>Skick</span><b>${c.condition}%</b></div><button class="btn ${funds>=c.price?'good':''}" ${funds<c.price?'disabled':''} onclick="buyCar12('${c.id}')">Köp bilen</button></div>`).join("")}</div>`;
+}
+function carLevel12(){
+ ensureV11();ensureAI12();let base=s.v11.carLevel||64,u=s.v11.upgrades;
+ return clamp(base+u.cooling*.5+u.diff*1.2+u.brakes*.8+u.suspension*1.2+u.data*.45+u.weight*.8,1,s.v11.carPotential||90);
+}
+function developCar12(k){
+ ensureV11();ensureAI12();let u=UPG11.find(x=>x[0]===k),cur=carLevel12(),pot=s.v11.carPotential||88;
+ if(cur>=pot-.2)return alert("Den här bilen är nära sin nuvarande utvecklingspotential.");
+ let lvl=s.v11.upgrades[k]||0,cost=Math.round(u[3]*(.7+lvl*.35));
+ if(s.cash<cost)return alert("Teamet har inte råd.");
+ s.cash-=cost;s.stats.costs+=cost;s.v11.upgrades[k]=lvl+1;
+ let tech=(s.v11.tech.mechanics+s.v11.tech.setup)/2,gain=(.7+tech/100)*(.7+Math.random()*.55);
+ s.v11.carLevel=Math.min(pot,(s.v11.carLevel||64)+gain);
+ s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+.35);
+ s.log.unshift(`${u[1]}: bilen förbättrades ${gain.toFixed(1)} nivåer.`);
+ garageV12();
+}
+function garageV12(){
+ ensureV11();ensureAI12();ensureV7();
+ if(!s.v12.carPurchased)return carMarket12();
+ let ev=currentCal()[s.event],ready=s.membership&&s.license&&s.safety,cl=carLevel12();
+ let raceButtons=ev?(ready?(!s.entered?`<button class="btn good" onclick="enterV12()">Anmäl & åk till ${ev[0]} – 6 500 kr</button>`:`<button class="btn primary" onclick="goWeekendV12()">🏁 Fortsätt till racehelgen</button>`):`<button class="btn primary" disabled>Racehelg låst – ordna administrationen</button>`):`<button class="btn primary" onclick="seasonSummary()">Säsongssammanfattning</button>`;
+ if(ev)raceButtons+=`<button class="btn" onclick="tab='week';render()">Planera veckan (${s.activities} aktiviteter kvar)</button>`;
+ main.innerHTML=`<section class="hero"><span class="badge">${s.cls}</span><h1>${s.v11.carName}</h1><p><b>Bilnivå ${cl.toFixed(1)}/100</b> • Potential ${s.v11.carPotential}/100 • Skick ${Math.round(s.v11.carCondition||90)}%</p><div class="controls">${raceButtons}</div></section>
+ <div class="grid"><div class="card span4"><h2>Ekonomi</h2><div class="big money">${m(s.cash)}</div><div class="row"><span>Privat reserv</span><b>${m(s.privateCash||0)}</b></div></div>
+ <div class="card span4"><h2>Förare</h2>${skillRowsV11(s.v11.driverSkills)}</div>
+ <div class="card span4"><h2>Verkstad</h2><div class="row"><span>Mekanik</span><b>${Math.round(s.v11.tech.mechanics)}</b></div><div class="row"><span>Setup</span><b>${Math.round(s.v11.tech.setup)}</b></div><div class="row"><span>Motor</span><b>${Math.round(s.v11.tech.engine)}</b></div><div class="row"><span>Data</span><b>${Math.round(s.v11.tech.data)}</b></div></div>
+ <div class="card span7"><h2>Förbättra bilen</h2><p class="muted">Varje jobb försöker höja bilens totala nivå mot dess potential. Din verkstadskompetens påverkar hur mycket du får ut av arbetet.</p>${UPG11.map(u=>{let l=s.v11.upgrades[u[0]]||0,c=Math.round(u[3]*(.7+l*.35));return `<div class="row"><span><b>${u[1]}</b><br><small class="muted">${u[2]}</small></span><span><button class="btn smallbtn" onclick="developCar12('${u[0]}')">Utveckla • ${m(c)}</button></span></div>`}).join("")}</div>
+ <div class="span5"><div class="card"><h2>Administration</h2>${req("membership","Medlemskap",650)}${req("license","SBF-licens",2200)}${req("safety","Säkerhetsutrustning",12500)}</div><div style="margin-top:12px">${tyreSelector()}</div></div></div>`;save();
+}
+garage=garageV12;garageV11Career=garageV12;
+
+// AI now uses unique skills + car level.
+const _field12old=field;
+field=function(){
+ ensureAI12();let a=[];
+ for(let cls of ["Modified","Standard"])for(let d of D[cls]){
+   let p=s.v12.ai[d[1]];
+   a.push({num:d[0],n:d[1],cls,skill:p.pace,trait:traits[(+d[0]||d[1].length)%traits.length],ai:p});
+ }
+ a.push({num:"117",n:s.name,cls:s.cls,skill:s.v11?.driverSkills?.pace||s.driver,trait:"Du",you:true});
+ return a;
+}
+const _driverLap12old=driverLapV11;
+driverLapV11=function(x){
+ if(!x.you&&x.ai){
+   let classP=x.cls==="Modified"?-2.15:0,car=-(x.ai.carLevel-65)*.028,wet=s.weather==="Regn"?-(x.ai.wet-50)*.018:0;
+   let noise=(Math.random()-.5)*(1.0-(x.ai.consistency-50)*.006);
+   return live.base+(88-x.ai.pace)*.055+classP+car+wet+noise;
+ }
+ let r=_driverLap12old(x);r-=(carLevel12()-64)*.028;return r;
+}
+// AI develops from race laps; cars also improve gradually during season.
+function aiDevelop12(){
+ ensureAI12();
+ for(let p of Object.values(s.v12.ai)){
+   p.pace=Math.min(96,p.pace+p.development*.03);p.racecraft=Math.min(96,p.racecraft+p.development*.04);
+   p.consistency=Math.min(96,p.consistency+p.development*.025);
+   if(p.carLevel<p.carPotential&&Math.random()<.12)p.carLevel=Math.min(p.carPotential,p.carLevel+.08+Math.random()*.18);
+ }
+}
+const _advance12old=advanceV11;
+advanceV11=function(n=1){_advance12old(n);aiDevelop12()}
+
+// Race decisions based on actual nearby cars.
+function maybeDecision12(){
+ if(!live||live.finished||live.decision)return;
+ let active=live.field.filter(x=>!x.dnf),me=active.find(x=>x.you);if(!me)return;
+ let i=active.indexOf(me),ahead=active[i-1],behind=active[i+1];
+ if(ahead&&me.total-ahead.total<.75&&Math.random()<.28){
+   live.decision={type:"attack",target:ahead.n};
+ }else if(behind&&behind.total-me.total<.65&&Math.random()<.24){
+   live.decision={type:"defend",target:behind.n};
+ }else if(Math.random()<.035){
+   live.decision={type:"car",target:null};
+ }
+}
+const _advanceDecision12=advanceV11;
+advanceV11=function(n=1){
+ _advanceDecision12(n);
+ if(live&&!live.finished){maybeDecision12();liveViewV12()}
+}
+function decision12(choice){
+ let d=live.decision,me=live.field.find(x=>x.you);if(!d||!me)return;
+ if(d.type==="attack"){
+   let target=live.field.find(x=>x.n===d.target);
+   if(choice==="wait"){live.events.unshift(`🧠 Du avvaktar bakom ${d.target}.`)}
+   if(choice==="normal"){me.total-=.10;live.risk=1;live.events.unshift(`⚔️ Du pressar ${d.target} och letar lucka.`)}
+   if(choice==="send"){me.total-=.24;live.risk=2;if(Math.random()<.13){me.total+=1.4;live.events.unshift(`⚠️ Attacken på ${d.target} blir för optimistisk – du tappar tid.`)}else live.events.unshift(`🔥 Du skickar ett offensivt försök på ${d.target}.`)}
+ }
+ if(d.type==="defend"){
+   if(choice==="class"){live.risk=0;live.events.unshift(`🧠 Du prioriterar ditt eget race och försvarar inte maximalt.`)}
+   if(choice==="normal"){me.total-=.05;live.events.unshift(`🛡️ Du placerar bilen smart mot ${d.target}.`)}
+   if(choice==="hard"){me.total-=.12;if(Math.random()<.10){me.total+=1.2;live.events.unshift(`⚠️ Hårt försvar kostar fart ut ur kurvan.`)}else live.events.unshift(`🚪 Du stänger dörren mot ${d.target}.`)}
+ }
+ if(d.type==="car"){
+   if(choice==="cool"){live.risk=0;me.total+=.25;s.parts.brakes=Math.min(100,s.parts.brakes+.5);live.events.unshift(`🧊 Du backar av lite för att kyla bilen.`)}
+   if(choice==="push"){live.risk=2;me.total-=.12;live.events.unshift(`🔥 Du fortsätter pressa trots varningen.`)}
+ }
+ live.decision=null;sortTimeV11();save();liveViewV12();
+}
+function liveViewV12(){
+ let active=live.field.filter(x=>!x.dnf),me=live.field.find(x=>x.you),idx=active.indexOf(me),ahead=idx>0?active[idx-1]:null,behind=idx>=0&&idx<active.length-1?active[idx+1]:null;
+ let rows=live.field.slice(Math.max(0,(me?.pos||1)-6),Math.min(live.field.length,(me?.pos||1)+5)),dec="";
+ if(live.decision){
+   let d=live.decision;
+   if(d.type==="attack")dec=`<div class="decision"><h2>⚔️ ${d.target} är inom räckhåll</h2><p>Du ligger tätt bakom. Hur vill du hantera situationen?</p><div class="controls"><button class="btn" onclick="decision12('wait')">Avvakta</button><button class="btn good" onclick="decision12('normal')">Pressa</button><button class="btn primary" onclick="decision12('send')">Skicka!</button></div></div>`;
+   if(d.type==="defend")dec=`<div class="decision"><h2>🪞 ${d.target} fyller backspegeln</h2><p>Föraren bakom är nära nog för att attackera.</p><div class="controls"><button class="btn" onclick="decision12('class')">Tänk på klassen</button><button class="btn good" onclick="decision12('normal')">Försvara smart</button><button class="btn primary" onclick="decision12('hard')">Stäng dörren</button></div></div>`;
+   if(d.type==="car")dec=`<div class="decision"><h2>🌡️ Bilen börjar kännas ansträngd</h2><p>Bromsar och temperaturer börjar märkas.</p><div class="controls"><button class="btn good" onclick="decision12('cool')">Kyl bilen</button><button class="btn primary" onclick="decision12('push')">Fortsätt pressa</button></div></div>`;
+ }
+ main.innerHTML=`<section class="hero"><span class="badge red">${live.track} • RACE ${s.raceNo+1}</span><h1>Varv ${live.lap}/${live.laps} • ${me?.dnf?"DNF":"P"+me?.pos}</h1><p>${ahead?`${(me.total-ahead.total).toFixed(1)} s till ${ahead.n}`:"Du leder"} • ${behind?`${(behind.total-me.total).toFixed(1)} s bak till ${behind.n}`:"Fritt bakom"}</p></section>${dec}
+ <div class="grid"><div class="card span8"><h2>Live timing</h2><table><tr><th>P</th><th>Förare</th><th>Klass</th><th>Senaste</th><th>Gap</th></tr>${rows.map(x=>`<tr class="${x.you?'you':''}"><td>${x.dnf?"DNF":x.pos}</td><td>${x.n}</td><td>${x.cls}</td><td>${x.dnf?"—":x.last?x.last.toFixed(3):"—"}</td><td>${x.dnf?"—":x.pos===1?"LEADER":"+"+x.gap.toFixed(1)}</td></tr>`).join("")}</table><div class="controls">${!live.finished&&!live.decision?`<button class="btn primary" onclick="advanceV11(1)">Nästa varv</button><button class="btn" onclick="advanceV11(3)">+3 varv</button>`:""}</div></div>
+ <div class="card span4"><h2>Raceplan</h2><div class="controls"><button class="btn ${live.risk===0?'good':''}" onclick="live.risk=0;liveViewV12()">Spara</button><button class="btn ${live.risk===1?'good':''}" onclick="live.risk=1;liveViewV12()">Normal</button><button class="btn ${live.risk===2?'good':''}" onclick="live.risk=2;liveViewV12()">Attack</button></div><h2 style="margin-top:18px">Race Control</h2>${live.events.slice(0,8).map(e=>`<div class="event">${e}</div>`).join("")}</div></div>`;save();
+}
+liveViewV11=liveViewV12;liveViewV6=liveViewV12;liveView=liveViewV12;
+ensureV11();ensureAI12();
+
+
+// ==================== v2.0 PADDOCK LIFE ====================
+function ensureV13(){
+ ensureV11();ensureAI12();s.v13=s.v13||{};
+ s.v13.number=s.v13.number||"117";
+ s.v13.equipment=s.v13.equipment||{trailer:0,bus:0,tools:0,spares:0,tent:0};
+ s.v13.relations=s.v13.relations||{};
+ s.v13.weekendIssues=s.v13.weekendIssues||[];
+ for(let cls of ["Standard","Modified"])for(let d of D[cls]) if(s.v13.relations[d[1]]==null)s.v13.relations[d[1]]=0;
+}
+function usedNumbers13(){
+ let a=[];for(let cls of ["Standard","Modified"])for(let d of D[cls])a.push(String(d[0]));return a;
+}
+function chooseNumber13(){
+ ensureV13();let v=prompt("Vilket startnummer vill du ha? (1–999)",s.v13.number);
+ if(v==null)return;v=String(parseInt(v,10));
+ if(!/^\d{1,3}$/.test(v)||+v<1)return alert("Välj ett nummer mellan 1 och 999.");
+ if(usedNumbers13().includes(v))return alert("Det numret används redan av en förare i startfältet.");
+ s.v13.number=v;save();garageV13();
+}
+const EQUIP13=[
+ ["trailer","Biltrailer",18000,"Du kan transportera bilen tryggare och enklare.",1],
+ ["bus","Racebuss",85000,"Bättre arbetsplats, förvaring och återhämtning under helgen.",2],
+ ["tools","Bättre verktyg",12500,"Ökar chansen att laga problem själv.",3],
+ ["spares","Reservdelspaket",16000,"Fler fel kan lösas direkt i depån.",3],
+ ["tent","Depåtält & arbetsyta",9500,"Bättre garagearbete och enklare att hjälpa varandra.",2]
+];
+function buyEquip13(k){
+ ensureV13();let e=EQUIP13.find(x=>x[0]===k);if(!e||s.v13.equipment[k])return;
+ if(s.cash<e[2])return alert("Teamet har inte råd.");s.cash-=e[2];s.stats.costs+=e[2];s.v13.equipment[k]=1;
+ s.log.unshift(`Du köpte ${e[1]}.`);garageV13();
+}
+function relationName13(){
+ ensureV13();let entries=Object.entries(s.v13.relations).sort((a,b)=>b[1]-a[1]);return entries[0]?.[0]||"Ingen ännu";
+}
+function relationLabel13(v){return v>=60?"Nära vän":v>=35?"Bra relation":v>=15?"Bekant":v>-15?"Neutral":v>-35?"Spänd":"Rival";}
+function paddock13(){
+ ensureV13();let rel=Object.entries(s.v13.relations).sort((a,b)=>b[1]-a[1]);
+ main.innerHTML=`<section class="hero"><span class="badge red">DEPÅLIV</span><h1>Relationer & gemenskap</h1><p>MX-5 Cup är inte bara racen. Hjälp, kunskap och relationer i depån kan avgöra om du kommer till start.</p></section>
+ <div class="grid"><div class="card span7"><h2>Förare</h2>${rel.map(([n,v])=>`<div class="row"><span><b>${n}</b><br><small>${relationLabel13(v)}</small></span><b>${v>0?"+":""}${Math.round(v)}</b></div>`).join("")}</div>
+ <div class="card span5"><h2>Gemensam garagekväll</h2><p>Bjud in en förare. Ni skruvar, snackar setup och lär känna varandra. Kostar en veckaktivitet.</p><select id="garageFriend">${rel.slice(0,16).map(([n])=>`<option>${n}</option>`).join("")}</select><button class="btn good" onclick="garageNight13()">Ordna garagekväll</button><p class="muted">Bra relationer ökar chansen att få hjälp när något går sönder under en racehelg.</p></div></div>`;
+}
+function garageNight13(){
+ ensureV13();if(s.activities<=0)return alert("Du har inga veckaktiviteter kvar.");
+ let n=document.getElementById("garageFriend").value;s.activities--;s.v13.relations[n]=Math.min(100,s.v13.relations[n]+7+Math.random()*6);
+ s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+1.2);s.v11.tech.setup=Math.min(100,s.v11.tech.setup+.7);
+ let ai=s.v12.ai[n];if(ai){ai.carLevel=Math.min(ai.carPotential,ai.carLevel+.2);ai.racecraft=Math.min(96,ai.racecraft+.05)}
+ s.log.unshift(`Garagekväll med ${n}: ni lärde er av varandra.`);save();paddock13();
+}
+function equipmentCard13(){
+ ensureV13();return `<div class="card"><h2>Depå & transport</h2>${EQUIP13.map(e=>`<div class="row"><span><b>${e[1]}</b><br><small class="muted">${e[3]}</small></span>${s.v13.equipment[e[0]]?"<b>✓ Ägs</b>":`<button class="btn smallbtn" onclick="buyEquip13('${e[0]}')">${m(e[2])}</button>`}</div>`).join("")}</div>`;
+}
+const _garageV13base=garageV12;
+function garageV13(){
+ ensureV13();if(!s.v12.carPurchased)return carMarket12();
+ _garageV13base();
+ let hero=main.querySelector(".hero");
+ if(hero){
+   hero.querySelector("h1").innerHTML=`${s.v11.carName.replace(/#\d+/,"").trim()} <span class="muted">#${s.v13.number}</span>`;
+   let c=hero.querySelector(".controls");if(c)c.insertAdjacentHTML("beforeend",`<button class="btn" onclick="chooseNumber13()">Byt startnummer</button><button class="btn" onclick="paddock13()">Relationer</button>`);
+ }
+ let grid=main.querySelector(".grid");if(grid)grid.insertAdjacentHTML("beforeend",`<div class="span12">${equipmentCard13()}</div>`);
+}
+garage=garageV13;garageV12=garageV13;
+
+// Player number everywhere in newly created race fields.
+const _field13base=field;
+field=function(){ensureV13();let f=_field13base();let me=f.find(x=>x.you);if(me)me.num=s.v13.number;return f;}
+
+// Weekend problem system
+const ISSUES13=[
+ {name:"Bromspedalen känns svampig",difficulty:38,cost:900,part:"brakes",text:"Efter ett pass känns bromspedalen plötsligt lång."},
+ {name:"Missljud från höger fram",difficulty:48,cost:1800,part:"suspension",text:"Ett tydligt klonk hörs från framvagnen."},
+ {name:"Kylvätskeläckage",difficulty:62,cost:3200,part:"cooling",text:"Det droppar kylvätska under bilen."},
+ {name:"Växlarna går trögt",difficulty:68,cost:4800,part:"drivetrain",text:"Tvåan och trean börjar bli svåra att få i."},
+ {name:"Sprucken bromsskiva",difficulty:55,cost:2600,part:"brakes",text:"Vid kontroll hittar du en spricka i en bromsskiva."},
+ {name:"Elfel / startproblem",difficulty:45,cost:1200,part:"electric",text:"Bilen vägrar plötsligt starta i depån."}
+];
+function maybeIssue13(stage){
+ ensureV13();if(s.v13.activeIssue)return true;
+ let chance=stage==="practice"?.20:stage==="qual"?.12:.07;
+ if(Math.random()>chance)return false;
+ let q=ISSUES13[Math.floor(Math.random()*ISSUES13.length)];s.v13.activeIssue={...q,stage};save();issueView13();return true;
+}
+function issueView13(){
+ let q=s.v13.activeIssue;if(!q)return;let friend=relationName13(),rv=s.v13.relations[friend]||0;
+ main.innerHTML=`<section class="hero"><span class="badge red">PROBLEM I DEPÅN</span><h1>🔧 ${q.name}</h1><p>${q.text}</p></section><div class="grid">
+ <div class="card span4"><h2>Försök själv</h2><p>Din mekanik: ${Math.round(s.v11.tech.mechanics)}. Bättre verktyg hjälper.</p><button class="btn good" onclick="solveIssue13('self')">Skruva själv</button></div>
+ <div class="card span4"><h2>Be om hjälp</h2><p>${friend} är din bästa kontakt (${relationLabel13(rv)}). Relation och depåutrustning påverkar.</p><button class="btn" onclick="solveIssue13('friend')">Fråga ${friend}</button></div>
+ <div class="card span4"><h2>Köp hjälp/delar</h2><p>Försök lösa problemet snabbt för cirka ${m(q.cost)}.</p><button class="btn" onclick="solveIssue13('pay')">Lös med pengar</button><button class="btn bad" onclick="solveIssue13('retire')">Kasta in handduken</button></div></div>`;
+}
+function solveIssue13(how){
+ ensureV13();let q=s.v13.activeIssue,ok=false,msg="";
+ if(how==="self"){let skill=s.v11.tech.mechanics+(s.v13.equipment.tools?15:0)+(s.v13.equipment.spares?8:0);ok=Math.random()*100<skill-q.difficulty+55;msg=ok?"Du lyckas hitta felet och fixa bilen.":"Du får inte ordning på problemet själv."}
+ if(how==="friend"){let n=relationName13(),r=s.v13.relations[n]||0;ok=Math.random()*100<48+r*.55+(s.v13.equipment.tent?8:0);if(ok){s.v13.relations[n]=Math.min(100,r+4);msg=`${n} kommer över och tillsammans löser ni problemet.`}else msg=`${n} försöker hjälpa, men ni får inte ordning på bilen.`}
+ if(how==="pay"){if(s.cash>=q.cost){s.cash-=q.cost;s.stats.costs+=q.cost;ok=Math.random()<.92;msg=ok?"Delar och hjälp löser problemet.":"Ni byter delar men felet kvarstår."}else msg="Du har inte råd med den snabba lösningen."}
+ if(how==="retire"){s.v13.activeIssue=null;s.entered=false;s.session="garage";s.log.unshift(`Du tvingades avbryta helgen: ${q.name}.`);save();alert("Racehelgen är över för din del.");return garageV13()}
+ if(ok){s.v13.activeIssue=null;s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+.35);s.log.unshift(msg);save();alert(msg);return practiceV12()}
+ alert(msg+"\nDu kan försöka en annan lösning.");save();issueView13();
+}
+
+// Problems can occur when entering practice and after practice runs.
+const _practiceV13base=practiceV12;
+practiceV12=function(){ensureV13();if(s.v13.activeIssue)return issueView13();_practiceV13base()}
+const _practiceRun13base=practiceRunV12;
+practiceRunV12=function(){_practiceRun13base();if(!s.v13.activeIssue&&Math.random()<.16){let q=ISSUES13[Math.floor(Math.random()*ISSUES13.length)];s.v13.activeIssue={...q,stage:"practice"};save();issueView13();}}
+
+// More contextual race decisions: contact/temperature/brakes in addition to battles.
+const _maybeDecision13base=maybeDecision12;
+maybeDecision12=function(){
+ _maybeDecision13base();if(live.decision)return;
+ if(Math.random()<.025)live.decision={type:"contact",target:null};
+}
+const _liveView13base=liveViewV12;
+liveViewV12=function(){
+ _liveView13base();
+ if(live?.decision?.type==="contact"){
+  let d=document.querySelector(".decision");
+  if(!d){let hero=main.querySelector(".hero");hero.insertAdjacentHTML("afterend",`<div class="decision"><h2>💥 Du känner en smäll från bilen</h2><p>Efter närkontakt vibrerar ratten. Du vet inte om det bara är kosmetiskt eller något viktigare.</p><div class="controls"><button class="btn good" onclick="decision13contact('continue')">Känn efter ett varv</button><button class="btn" onclick="decision13contact('pit')">Gå i depå och kontrollera</button><button class="btn primary" onclick="decision13contact('push')">Ignorera och kör</button></div></div>`)}
+ }
+}
+function decision13contact(c){
+ let me=live.field.find(x=>x.you);
+ if(c==="continue"){me.total+=.35;live.risk=0;live.events.unshift("🔎 Du sänker tempot och känner efter. Bilen verkar körbar.")}
+ if(c==="pit"){me.total+=18;live.events.unshift("🔧 Du tar depån. Inget kritiskt hittas, men du tappar mycket tid.")}
+ if(c==="push"){if(Math.random()<.18){me.total+=4;live.events.unshift("⚠️ Vibrationen blir värre och kostar flera sekunder.")}else live.events.unshift("🔥 Du fortsätter. Bilen håller ihop.")}
+ live.decision=null;sortTimeV11();save();liveViewV12();
+}
+liveViewV11=liveViewV12;liveView=liveViewV12;
+ensureV13();
+
+
+// ==================== v2.0 CHAMPIONSHIP, CASHFLOW & PADDOCK EVENTS ====================
+function ensureV14(){
+ ensureV13();s.v14=s.v14||{};
+ s.v14.income=s.v14.income||{sponsor:0,private:0,other:0};
+ s.v14.weekendSocialDone=s.v14.weekendSocialDone||{};
+ s.v14.pendingSocial=s.v14.pendingSocial||null;
+}
+function awardChampionship14(){
+ ensureV14();if(!live||live._pointsAwarded)return;
+ let classified=live.field.filter(x=>!x.dnf);
+ for(let cls of ["Standard","Modified"]){
+   let cf=classified.filter(x=>x.cls===cls);
+   cf.forEach((x,i)=>{
+     let pts=PTS[i]||0;
+     s.champ[cls][x.n]=(s.champ[cls][x.n]||0)+pts;
+   });
+ }
+ live._pointsAwarded=true;
+}
+const _finishRace14base=finishRaceV11;
+finishRaceV11=function(){
+ awardChampionship14();
+ let me=live.field.find(x=>x.you),classified=live.field.filter(x=>!x.dnf),cf=classified.filter(x=>x.cls===s.cls),cp=me?.dnf?99:cf.indexOf(me)+1;
+ // sponsor performance payout per race
+ if(s.sponsor&&!me?.dnf){
+   let bonus=cp<=3?Math.round(s.sponsor.raceBonus*1.8):cp<=10?s.sponsor.raceBonus:Math.round(s.sponsor.raceBonus*.35);
+   if(bonus>0){s.cash+=bonus;s.v14.income.sponsor+=bonus;s.log.unshift(`${s.sponsor.name}: ${m(bonus)} i resultatbonus för P${cp}.`)}
+ }
+ return _finishRace14base();
+}
+
+// Sponsor contracts now create recurring income rather than one signing payment.
+sponsorOffer=function(){
+ ensureV14();
+ if(s.sponsor){s.log.unshift("Du har redan ett aktivt huvudsponsoravtal.");return}
+ let roll=Math.random(),rep=s.rep||0;
+ if(roll<.25){s.log.unshift("Sponsorjakten gav inget avtal den här gången.");return}
+ let tier=rep>=28?2:rep>=14?1:0;
+ let offers=[
+  {name:"Lokal Bilservice",sign:5000,event:4500,raceBonus:1200},
+  {name:"Skåne Motorsport AB",sign:9000,event:7000,raceBonus:2000},
+  {name:"Nordic Track Solutions",sign:14000,event:10500,raceBonus:3000}
+ ][tier];
+ s.sponsor={...offers};s.cash+=offers.sign;s.v14.income.sponsor+=offers.sign;
+ s.log.unshift(`${offers.name} skriver avtal: ${m(offers.sign)} direkt + ${m(offers.event)} per racehelg.`);
+ save();
+}
+
+function weekendIncome14(){
+ ensureV14();let total=0;
+ if(s.sponsor){
+   total+=s.sponsor.event||0;
+   if(s.sponsor.event){s.v14.income.sponsor+=s.sponsor.event;s.log.unshift(`${s.sponsor.name}: ${m(s.sponsor.event)} i helgbidrag.`)}
+ }
+ // Small supporter/local partner income as reputation grows.
+ let local=Math.round(1200+(s.rep||0)*55);
+ total+=local;s.v14.income.other+=local;
+ s.cash+=total;
+ return total;
+}
+const _finishEvent14base=finishEvent;
+finishEvent=function(){
+ ensureV14();let ev=currentCal()[s.event]?.[0]||"Racehelgen";
+ let income=weekendIncome14();
+ _finishEvent14base();
+ s.log.unshift(`${ev}: ${m(income)} kom in från sponsorer och lokalt stöd.`);
+ save();
+}
+
+// Annual private racing reserve actually gets replenished.
+const _newSeason14base=newSeason;
+newSeason=function(){
+ ensureV14();let add=annualPrivateV11();s.v14.income.private+=add;
+ _newSeason14base();
+ s.log.unshift(`Under vintern lyckades du lägga undan ${m(add)} privat till racingen.`);
+ save();
+}
+
+// Economy page explains how the season can survive.
+econ=function(){
+ ensureV14();
+ let projected=s.sponsor?(s.sponsor.event||0)*Math.max(0,currentCal().length-s.event):0;
+ main.innerHTML=`<h1>Ekonomi</h1><div class="grid">
+ <div class="card span6"><h2>Racingbudget</h2><div class="big money">${m(s.cash)}</div><div class="row"><span>Privat reserv</span><b>${m(s.privateCash||0)}</b></div><div class="row"><span>Säsongens kostnader</span><b>${m(s.stats.costs||0)}</b></div><div class="row"><span>Sponsorintäkter</span><b>${m(s.v14.income.sponsor)}</b></div><div class="row"><span>Övriga intäkter</span><b>${m(s.v14.income.other)}</b></div><button class="btn" onclick="inject()">Skjut till 5 000 privat</button></div>
+ <div class="card span6"><h2>Huvudsponsor</h2>${s.sponsor?`<h3>${s.sponsor.name}</h3><div class="row"><span>Bidrag per racehelg</span><b>${m(s.sponsor.event||0)}</b></div><div class="row"><span>Normal resultatbonus</span><b>${m(s.sponsor.raceBonus||0)}</b></div><div class="row"><span>Kvarvarande garanterat stöd</span><b>${m(projected)}</b></div>`:`<p>Ingen huvudsponsor. Lägg en veckaktivitet på <b>Sponsorjakt</b>. Ett avtal ger nu både signeringspengar och stöd varje racehelg.</p>`}</div>
+ <div class="card span12"><h2>Hur ekonomin är tänkt att fungera</h2><p class="muted">Klubbracing ska fortfarande kosta pengar, men satsningen ska kunna överleva genom privat årsbudget, huvudsponsor, mindre lokalt stöd och resultatbonusar. En bättre bil och större utrustning kräver att du bygger upp ekonomin över flera säsonger.</p></div></div>`;
+}
+
+// Championship view includes races and makes zero-point state obvious.
+champ=function(){
+ ensureV14();
+ main.innerHTML=`<section class="hero"><span class="badge red">${s.season}</span><h1>Mästerskapet</h1><p>${s.stats.starts||0} race körda. Poäng delas ut efter varje race: ${PTS.slice(0,10).join("–")}…</p></section><div class="grid"><div class="card span6"><h2>Modified</h2>${standings("Modified")}</div><div class="card span6"><h2>Standard</h2>${standings("Standard")}</div></div>`;
+}
+
+// Race-weekend social events. Choices directly alter relationships.
+const SOCIAL14=[
+ {title:"En domkraft saknas",text:n=>`${n} står bredvid bilen och svär. Domkraften har gett upp precis när hjulen ska av.`,
+  choices:[["Låna ut din utrustning",7,0],["Hjälp till och skruva",10,0],["Du har fullt upp själv",-2,0]]},
+ {title:"Setup-snack över kaffe",text:n=>`${n} kommer förbi och frågar hur bilen känns i den snabba delen av banan.`,
+  choices:[["Dela med dig öppet",8,1],["Byt information",6,2],["Håll setupen för dig själv",-4,0]]},
+ {title:"Reservdel i depån",text:n=>`${n} behöver en liten reservdel som du råkar ha med dig.`,
+  choices:[["Ge bort delen",10,-700],["Sälj den till självkostnad",5,500],["Behåll dina reservdelar",-3,0]]},
+ {title:"Kväll i depån",text:n=>`${n} och några andra sitter kvar efter dagens körning och snackar racing.`,
+  choices:[["Slå dig ner en stund",8,0],["Hjälp ${n} med bilen",11,0],["Gå igenom din egen data",1,0]]}
+];
+function pickSocialDriver14(){
+ let names=Object.keys(s.v13.relations||{});if(!names.length)return null;
+ // More likely to meet people already around you, but not always best friend.
+ names.sort((a,b)=>(s.v13.relations[b]||0)-(s.v13.relations[a]||0));
+ return Math.random()<.55?names[Math.floor(Math.random()*Math.min(8,names.length))]:names[Math.floor(Math.random()*names.length)];
+}
+function maybeSocial14(){
+ ensureV14();let key=`${s.season}-${s.event}-${s.v7.practiceRuns}`;
+ if(s.v14.weekendSocialDone[key]||s.v14.pendingSocial)return false;
+ if(s.v7.practiceRuns===0||Math.random()>.38)return false;
+ let n=pickSocialDriver14(),e=SOCIAL14[Math.floor(Math.random()*SOCIAL14.length)];
+ if(!n)return false;
+ s.v14.weekendSocialDone[key]=true;s.v14.pendingSocial={driver:n,event:e};save();socialView14();return true;
+}
+function socialView14(){
+ let p=s.v14.pendingSocial;if(!p)return practiceV12();
+ let e=p.event,n=p.driver;
+ main.innerHTML=`<section class="hero"><span class="badge red">DEPÅHÄNDELSE</span><h1>${e.title}</h1><p>${e.text(n)}</p></section>
+ <div class="card"><h2>${n}</h2><p>Relation idag: <b>${relationLabel13(s.v13.relations[n]||0)}</b> (${Math.round(s.v13.relations[n]||0)})</p><div class="choice">${e.choices.map((c,i)=>`<button onclick="socialChoice14(${i})"><strong>${c[0].replace("${n}",n)}</strong></button>`).join("")}</div></div>`;
+}
+function socialChoice14(i){
+ let p=s.v14.pendingSocial,c=p.event.choices[i],n=p.driver;
+ s.v13.relations[n]=clamp((s.v13.relations[n]||0)+c[1],-100,100);
+ if(c[2]){
+   s.cash+=c[2];
+   if(c[2]>0)s.v14.income.other+=c[2];else s.stats.costs+=Math.abs(c[2]);
+ }
+ if(i===1){s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+.18);s.v11.tech.setup=Math.min(100,s.v11.tech.setup+.12)}
+ s.log.unshift(`${p.event.title} med ${n}: relation ${c[1]>=0?"+":""}${c[1]}.`);
+ s.v14.pendingSocial=null;save();practiceV12();
+}
+
+// Hook after practice without breaking existing mechanical issue flow.
+const _practiceRun14base=practiceRunV12;
+practiceRunV12=function(){
+ _practiceRun14base();
+ if(!s.v13?.activeIssue)maybeSocial14();
+}
+ensureV14();
+
+
+// ==================== v2.0 CAREER FREEDOM & LIFE BETWEEN RACES ====================
+function ensureV15(){
+ ensureV14();s.v15=s.v15||{};
+ s.v15.clubRep=s.v15.clubRep||0;
+ s.v15.projects=s.v15.projects||{chassisKnowledge:0,reliability:0,workshop:0};
+ s.v15.marketRefresh=s.v15.marketRefresh||0;
+ s.v15.lifeLog=s.v15.lifeLog||[];
+}
+
+// Relationships: strongly prefer drivers in the player's own class.
+pickSocialDriver14=function(){
+ ensureV15();
+ let same=[],other=[];
+ for(let cls of ["Standard","Modified"])for(let d of D[cls]){
+   if(d[1]===s.name)continue;
+   (cls===s.cls?same:other).push(d[1]);
+ }
+ let pool=Math.random()<.82&&same.length?same:other;
+ // Familiar faces are somewhat more likely, but the paddock still rotates.
+ pool.sort((a,b)=>(s.v13.relations[b]||0)-(s.v13.relations[a]||0));
+ if(Math.random()<.45)return pool[Math.floor(Math.random()*Math.min(7,pool.length))];
+ return pool[Math.floor(Math.random()*pool.length)];
+}
+
+// Used-car market now exists throughout the career.
+function marketCars15(){
+ ensureV15();
+ let base=CAR_MARKET12.map(c=>({...c}));
+ // Add a few changing fictional used cars each refresh.
+ let names=["#7","#18","#41","#53","#69","#96"], list=[];
+ for(let i=0;i<3;i++){
+   let cls=(i+s.v15.marketRefresh)%3===0?"Modified":"Standard";
+   let level=Math.round((cls==="Modified"?68:57)+Math.random()*17);
+   let pot=Math.min(97,level+7+Math.round(Math.random()*15));
+   let cond=Math.round(66+Math.random()*30);
+   let price=Math.round((cls==="Modified"?105000:57000)+(level-55)*3100+(cond-70)*450);
+   list.push({id:`dyn${s.v15.marketRefresh}_${i}`,name:`MX-5 NC ${cls} ${names[(i+s.v15.marketRefresh)%names.length]}`,cls,price,level,condition:cond,potential:pot,note:"Begagnad tävlingsbil från klubbscenen."});
+ }
+ s.v15.dynamicMarket=list;return [...base,...list];
+}
+function currentCarValue15(){
+ ensureV15();
+ let lvl=carLevel12(),cond=s.v11.carCondition||85,pot=s.v11.carPotential||85;
+ return Math.max(35000,Math.round((s.cls==="Modified"?65000:38000)+lvl*950+pot*330+cond*190));
+}
+function carMarket15(){
+ ensureV15();let cars=marketCars15(),funds=s.cash+(s.privateCash||0),trade=s.v12.carPurchased?currentCarValue15():0;
+ main.innerHTML=`<section class="hero"><span class="badge red">BILMARKNAD</span><h1>${s.v12.carPurchased?"Byt tävlingsbil":"Köp din tävlingsbil"}</h1>
+ <p>Kapital ${m(funds)}${trade?` • Din nuvarande bil värderas till cirka <b>${m(trade)}</b>`:""}. Ett bilbyte nollställer bilens delar/utveckling men inte din förar- eller verkstadskompetens.</p>
+ <div class="controls">${s.v12.carPurchased?`<button class="btn" onclick="sellCar15()">Sälj nuvarande bil</button>`:""}<button class="btn" onclick="refreshMarket15()">Nya annonser</button><button class="btn" onclick="garageV13()">Tillbaka</button></div></section>
+ <div class="grid">${cars.map(c=>`<div class="card span6"><span class="badge">${c.cls}</span><h2>${c.name}</h2><p>${c.note}</p><div class="row"><span>Pris</span><b>${m(c.price)}</b></div><div class="row"><span>Bilnivå</span><b>${c.level}/100</b></div>${bar(c.level)}<div class="row"><span>Potential</span><b>${c.potential}/100</b></div><div class="row"><span>Skick</span><b>${c.condition}%</b></div><button class="btn good" onclick="buyCar15('${c.id}')">Köp${s.v12.carPurchased?" / byt":""}</button></div>`).join("")}</div>`;
+}
+function refreshMarket15(){s.v15.marketRefresh++;save();carMarket15()}
+function sellCar15(){
+ if(s.entered)return alert("Du kan inte sälja bilen mitt under en anmäld racehelg.");
+ let value=currentCarValue15();
+ if(!confirm(`Sälja ${s.v11.carName} för cirka ${m(value)}?`))return;
+ s.cash+=value;s.v12.carPurchased=false;s.log.unshift(`Du sålde ${s.v11.carName} för ${m(value)}.`);save();carMarket15();
+}
+function buyCar15(id){
+ let cars=marketCars15(),c=cars.find(x=>x.id===id);if(!c)return;
+ if(s.entered)return alert("Du kan inte byta bil mitt under en racehelg.");
+ let trade=s.v12.carPurchased?currentCarValue15():0,total=s.cash+(s.privateCash||0)+trade;
+ if(total<c.price)return alert("Du har inte råd ens om du säljer nuvarande bil.");
+ if(s.v12.carPurchased){
+   if(!confirm(`Byta in nuvarande bil för cirka ${m(trade)} och köpa ${c.name} för ${m(c.price)}?`))return;
+   s.cash+=trade;
+ }
+ let need=Math.max(0,c.price-s.cash);s.cash=Math.max(0,s.cash-c.price);s.privateCash=Math.max(0,(s.privateCash||0)-need);
+ s.cls=c.cls;s.v12.carPurchased=true;s.v11.carName=c.name;s.v11.purchasePrice=c.price;s.v11.carLevel=c.level;s.v11.carPotential=c.potential;s.v11.carCondition=c.condition;
+ s.car.condition=c.condition;s.v11.upgrades={cooling:0,diff:0,brakes:0,suspension:0,data:0,weight:0};
+ s.log.unshift(`Du köpte ${c.name} för ${m(c.price)}.`);save();garageV13();
+}
+carMarket12=carMarket15;
+
+// Potential can be raised, but it is expensive and uncertain.
+function potentialProject15(){
+ ensureV15();let pot=s.v11.carPotential||85;
+ if(pot>=98)return alert("Den här bilen har i praktiken nått sin maximala potential.");
+ let cost=Math.round(9000+(pot-70)*950);
+ if(s.cash<cost)return alert("Du har inte råd med utvecklingsprojektet.");
+ if(!confirm(`Starta ett större chassi-/utvecklingsprojekt för ${m(cost)}? Det kan höja bilens potential 1–4 nivåer.`))return;
+ s.cash-=cost;s.stats.costs+=cost;
+ let skill=(s.v11.tech.mechanics+s.v11.tech.setup+s.v11.tech.data)/3;
+ let gain=Math.max(1,Math.min(4,Math.round(1+Math.random()*2+skill/80)));
+ s.v11.carPotential=Math.min(98,pot+gain);s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+.7);s.v11.tech.setup=Math.min(100,s.v11.tech.setup+.5);
+ s.v15.projects.chassisKnowledge++;s.log.unshift(`Utvecklingsprojektet höjde bilens potential från ${pot} till ${s.v11.carPotential}.`);
+ save();garageV13();
+}
+
+// More life between races: club evenings, helping others, testing and side jobs.
+function lifeBetween15(){
+ ensureV15();let same=[];
+ for(let d of D[s.cls])if(d[1]!==s.name)same.push(d[1]);
+ main.innerHTML=`<section class="hero"><span class="badge red">MELLAN RACEN</span><h1>Livet runt teamet</h1><p>Du har ${s.activities} veckaktiviteter kvar. Här bygger du teamet, ekonomin och din plats i klubbscenen.</p></section>
+ <div class="grid">
+ <div class="card span4"><h2>🔧 Öppen garagekväll</h2><p>Bjud in några ${s.cls}-förare. Relationer, mekanik och setup utvecklas lite.</p><button class="btn good" onclick="lifeAction15('openGarage')">1 aktivitet</button></div>
+ <div class="card span4"><h2>🤝 Hjälp en konkurrent</h2><p>Åk över och hjälp en annan förare med bilen. Bygger stark relation och rykte.</p><select id="helpDriver15">${same.slice(0,15).map(n=>`<option>${n}</option>`).join("")}</select><button class="btn good" onclick="lifeAction15('help')">1 aktivitet</button></div>
+ <div class="card span4"><h2>💰 Extrajobb</h2><p>Ta ett kvälls-/helgjobb och lägg inkomsten direkt i racingbudgeten. Ingen utveckling, men välbehövliga pengar.</p><button class="btn" onclick="lifeAction15('work')">1 aktivitet</button></div>
+ <div class="card span4"><h2>🏁 Klubbträff</h2><p>Delta på träff, funktionärskväll eller klubbaktivitet. Bygger depårykte och nya kontakter.</p><button class="btn" onclick="lifeAction15('club')">1 aktivitet</button></div>
+ <div class="card span4"><h2>📊 Studera data</h2><p>Gå igenom onboard och logger. Förbättrar kval, jämnhet och dataförmåga.</p><button class="btn" onclick="lifeAction15('data')">1 aktivitet</button></div>
+ <div class="card span4"><h2>🚗 Bilmarknaden</h2><p>Se vad andra tävlingsbilar kostar eller byt projekt.</p><button class="btn" onclick="carMarket15()">Öppna annonser</button></div>
+ </div>`;
+}
+function lifeAction15(type){
+ ensureV15();if(s.activities<=0)return alert("Du har inga veckaktiviteter kvar.");
+ s.activities--;
+ if(type==="openGarage"){
+   let pool=D[s.cls].map(d=>d[1]).filter(n=>n!==s.name).sort(()=>Math.random()-.5).slice(0,3);
+   pool.forEach(n=>s.v13.relations[n]=Math.min(100,(s.v13.relations[n]||0)+4+Math.random()*4));
+   s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+.7);s.v11.tech.setup=Math.min(100,s.v11.tech.setup+.5);
+   s.v15.lifeLog.unshift(`Öppen garagekväll med ${pool.join(", ")}.`);
+ }
+ if(type==="help"){
+   let n=document.getElementById("helpDriver15").value;s.v13.relations[n]=Math.min(100,(s.v13.relations[n]||0)+10+Math.random()*5);s.v15.clubRep+=2;
+   s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+.45);s.v15.lifeLog.unshift(`Du hjälpte ${n} med bilen.`);
+ }
+ if(type==="work"){
+   let pay=Math.round(2500+Math.random()*2500);s.cash+=pay;s.v14.income.other+=pay;s.v15.lifeLog.unshift(`Extrajobb gav ${m(pay)} till racingbudgeten.`);
+ }
+ if(type==="club"){
+   s.v15.clubRep+=4;s.rep=(s.rep||0)+1;
+   let pool=D[s.cls].map(d=>d[1]).filter(n=>n!==s.name).sort(()=>Math.random()-.5).slice(0,2);
+   pool.forEach(n=>s.v13.relations[n]=Math.min(100,(s.v13.relations[n]||0)+3));
+   s.v15.lifeLog.unshift(`Klubbkväll: du lärde känna ${pool.join(" och ")} bättre.`);
+ }
+ if(type==="data"){
+   s.v11.tech.data=Math.min(100,s.v11.tech.data+1);s.v11.driverSkills.qualifying=Math.min(95,s.v11.driverSkills.qualifying+.18);s.v11.driverSkills.consistency=Math.min(95,s.v11.driverSkills.consistency+.12);
+   s.v15.lifeLog.unshift("Du ägnade kvällen åt onboard och dataloggning.");
+ }
+ save();lifeBetween15();
+}
+
+// Add understandable career actions to garage.
+const _garage15base=garageV13;
+garageV13=function(){
+ ensureV15();_garage15base();
+ if(!s.v12.carPurchased)return;
+ let hero=main.querySelector(".hero"),controls=hero?.querySelector(".controls");
+ if(controls)controls.insertAdjacentHTML("beforeend",`<button class="btn" onclick="lifeBetween15()">Livet mellan racen</button><button class="btn" onclick="carMarket15()">Bilmarknad</button>`);
+ let cards=[...main.querySelectorAll(".card")],dev=cards.find(c=>c.querySelector("h2")?.textContent.includes("Förbättra bilen"));
+ if(dev)dev.insertAdjacentHTML("beforeend",`<hr><div class="row"><span><b>Flytta utvecklingstaket</b><br><small class="muted">Större projekt som kan höja potentialen på just den här bilen. Dyrt, men gör att du inte behöver byta bil.</small></span><button class="btn primary" onclick="potentialProject15()">Utveckla potential</button></div>`);
+}
+garage=garageV13;
+
+// Slightly more race-to-race variation without turning results into a lottery.
+const _makeLive15base=makeLiveV11;
+makeLiveV11=function(risk){
+ _makeLive15base(risk);
+ // Weekend form: roughly +/- 0.35 s/lap at the extremes; most are much closer.
+ live.weekendForm={};
+ live.field.forEach(x=>{
+   let consistency=x.you?s.v11.driverSkills.consistency:(x.ai?.consistency||70);
+   let spread=.22+(90-consistency)*.006;
+   let form=(Math.random()+Math.random()+Math.random()-1.5)*spread;
+   live.weekendForm[x.n]=form;
+ });
+ save();liveViewV12();
+}
+startRace=makeLiveV11;makeLiveV5=makeLiveV11;
+const _driverLap15base=driverLapV11;
+driverLapV11=function(x){
+ let t=_driverLap15base(x);
+ if(live?.weekendForm)t+=live.weekendForm[x.n]||0;
+ // Small lap-specific swings: traffic, tiny errors, confidence. Usually tenths, rarely more.
+ let cons=x.you?s.v11.driverSkills.consistency:(x.ai?.consistency||70);
+ let swing=(Math.random()+Math.random()-1)*(.16+(90-cons)*.005);
+ return t+swing;
+}
+
+// AI car development varies by driver/team rather than moving in lockstep.
+aiDevelop12=function(){
+ ensureAI12();
+ for(let p of Object.values(s.v12.ai)){
+   p.pace=Math.min(96,p.pace+p.development*.025);p.racecraft=Math.min(96,p.racecraft+p.development*.035);
+   p.consistency=Math.min(96,p.consistency+p.development*.018);
+   let ambition=.05+p.development*1.5;
+   if(p.carLevel<p.carPotential&&Math.random()<ambition)p.carLevel=Math.min(p.carPotential,p.carLevel+.04+Math.random()*.22);
+   if(p.carLevel>=p.carPotential-.3&&Math.random()<.002)p.carPotential=Math.min(98,p.carPotential+1);
+ }
+}
+ensureV15();
+
+
+// ==================== v2.0 ROAD CAR -> RACE CAR MARKET ====================
+const MXGEN16=[
+ {gen:"NA",years:[1989,1997],engines:["1.6","1.8"],base:26000,age:"första generationen"},
+ {gen:"NB",years:[1998,2004],engines:["1.6","1.8"],base:33000,age:"andra generationen"},
+ {gen:"NC",years:[2005,2014],engines:["1.8","2.0"],base:50000,age:"tredje generationen"},
+ {gen:"ND",years:[2015,2026],engines:["1.5","2.0"],base:105000,age:"fjärde generationen"}
+];
+function seeded16(seed,n){let x=Math.sin(seed*91.731+n*17.17)*43758.5453;return x-Math.floor(x)}
+function makeRoadCar16(i){
+ let seed=s.v15.marketRefresh*37+i*11+17, g=MXGEN16[Math.floor(seeded16(seed,1)*MXGEN16.length)];
+ let year=g.years[0]+Math.floor(seeded16(seed,2)*(g.years[1]-g.years[0]+1));
+ let engine=g.engines[Math.floor(seeded16(seed,3)*g.engines.length)];
+ let km=Math.round((3500+seeded16(seed,4)*19000)*(2027-year)/8+seeded16(seed,8)*4500);
+ km=Math.max(3200,Math.min(29500,km));
+ let cond=Math.round(52+seeded16(seed,5)*46);
+ let hidden=Math.round(48+seeded16(seed,6)*47);
+ let bargain=seeded16(seed,7);
+ let price=Math.round((g.base+(year-g.years[0])*2200+(engine==="2.0"?14000:engine==="1.8"?7000:0)+(cond-70)*650)*(bargain<.12?.68:bargain>.9?1.2:.88+seeded16(seed,9)*.2)/1000)*1000;
+ price=Math.max(18000,price);
+ let body=seeded16(seed,10)<.16?"PRHT": "Roadster";
+ let note=bargain<.12?"Priset ser nästan misstänkt bra ut. Kan vara ett riktigt fynd – eller något du missat.":cond<65?"Billig grundbil med tydligt renoveringsbehov.":hidden>85?"Ovanligt lovande grundobjekt.": "Vanlig gatbil med okänd tävlingspotential.";
+ return {id:`road${s.v15.marketRefresh}_${i}`,road:true,name:`Mazda MX-5 ${g.gen} ${engine} ${body}`,gen:g.gen,year,engine,km,price,condition:cond,hiddenPotential:hidden,note};
+}
+function raceConversion16(c,cls){
+ let ageBonus=c.gen==="NA"?-3:c.gen==="NB"?-1:c.gen==="NC"?3:c.gen==="ND"?5:0;
+ let engBonus=c.engine==="2.0"?4:c.engine==="1.8"?2:0;
+ let base=Math.round(48+c.condition*.15+ageBonus+engBonus+(cls==="Modified"?2:0));
+ let pot=Math.min(98,Math.max(base+7,c.hiddenPotential+(cls==="Modified"?3:0)));
+ return {level:Math.min(pot,base),potential:pot};
+}
+function conversionCost16(c,cls){
+ let safety=27000, prep=cls==="Modified"?47000:23000;
+ let age=c.gen==="NA"?9000:c.gen==="NB"?6000:c.gen==="NC"?2500:0;
+ return safety+prep+age;
+}
+function marketCars16(){
+ ensureV15();let race=marketCars15().filter(c=>!c.road);
+ let roads=[];for(let i=0;i<10;i++)roads.push(makeRoadCar16(i));
+ return {roads,race};
+}
+function carMarket15(){
+ ensureV15();let mk=marketCars16(),funds=s.cash+(s.privateCash||0),trade=s.v12.carPurchased?currentCarValue15():0;
+ main.innerHTML=`<section class="hero"><span class="badge red">BILMARKNAD</span><h1>${s.v12.carPurchased?"Nästa bilprojekt":"Hitta din första MX-5"}</h1>
+ <p>Det vanligaste och billigaste sättet in är nu att köpa en <b>vanlig gat-MX-5</b> och bygga den för Standard eller Modified. Färdiga tävlingsbilar finns också, men kostar mer.</p>
+ <div class="row"><span>Tillgängligt kapital</span><b>${m(funds)}</b></div>${trade?`<div class="row"><span>Nuvarande tävlingsbil</span><b>ca ${m(trade)}</b></div>`:""}
+ <div class="controls">${s.v12.carPurchased?`<button class="btn" onclick="sellCar15()">Sälj nuvarande bil</button>`:""}<button class="btn" onclick="refreshMarket15()">↻ Nya annonser</button><button class="btn" onclick="garageV13()">Tillbaka</button></div></section>
+ <div class="card"><h2>🚗 Gatbilar / byggprojekt</h2><p class="muted">Potentialen är en uppskattning innan köp. Vissa objekt kan visa sig vara bättre eller sämre än de ser ut – här kan du göra fynd.</p></div>
+ <div class="grid">${mk.roads.map(c=>`<div class="card span6"><span class="badge">${c.gen}</span><h2>${c.name}</h2><p>${c.year} • ${c.engine} liter • ${c.km.toLocaleString("sv-SE")} mil • ${c.note}</p>
+ <div class="row"><span>Begärt pris</span><b>${m(c.price)}</b></div><div class="row"><span>Skick</span><b>${c.condition}%</b></div>
+ <div class="row"><span>Bygg till Standard</span><b>ca ${m(conversionCost16(c,"Standard"))}</b></div><div class="row"><span>Bygg till Modified</span><b>ca ${m(conversionCost16(c,"Modified"))}</b></div>
+ <div class="controls"><button class="btn good" onclick="buyRoad16('${c.id}','Standard')">Köp + bygg Standard</button><button class="btn primary" onclick="buyRoad16('${c.id}','Modified')">Köp + bygg Modified</button></div></div>`).join("")}</div>
+ <div class="card"><h2>🏁 Färdiga tävlingsbilar</h2><p class="muted">Dyrare väg in, men du slipper grundbygget och vet mer om vad du får.</p></div>
+ <div class="grid">${mk.race.map(c=>`<div class="card span6"><span class="badge">${c.cls}</span><h2>${c.name}</h2><p>${c.note}</p><div class="row"><span>Pris</span><b>${m(c.price)}</b></div><div class="row"><span>Bilnivå</span><b>${c.level}/100</b></div><div class="row"><span>Potential</span><b>${c.potential}/100</b></div><div class="row"><span>Skick</span><b>${c.condition}%</b></div><button class="btn good" onclick="buyCar15('${c.id}')">Köp${s.v12.carPurchased?" / byt":""}</button></div>`).join("")}</div>`;
+}
+function buyRoad16(id,cls){
+ let c=marketCars16().roads.find(x=>x.id===id);if(!c)return;
+ if(s.entered)return alert("Du kan inte byta bil under en racehelg.");
+ let conv=conversionCost16(c,cls),trade=s.v12.carPurchased?currentCarValue15():0,total=s.cash+(s.privateCash||0)+trade,cost=c.price+conv;
+ if(total<cost)return alert(`Du behöver cirka ${m(cost)} för bil och grundbygge.`);
+ if(s.v12.carPurchased&&!confirm(`Sälja nuvarande bil för cirka ${m(trade)} och starta det här projektet?`))return;
+ if(s.v12.carPurchased)s.cash+=trade;
+ let need=Math.max(0,cost-s.cash);s.cash=Math.max(0,s.cash-cost);s.privateCash=Math.max(0,(s.privateCash||0)-need);
+ let perf=raceConversion16(c,cls);
+ // Reveal actual potential with small post-purchase uncertainty: source of bargains/lemon surprises.
+ let reveal=Math.max(perf.level+5,Math.min(98,perf.potential+Math.round((Math.random()-.5)*8)));
+ s.cls=cls;s.v12.carPurchased=true;s.v11.carName=`Mazda MX-5 ${c.gen} ${c.engine} ${c.year} – ${cls}`;
+ s.v11.purchasePrice=c.price;s.v11.carLevel=perf.level;s.v11.carPotential=reveal;s.v11.carCondition=c.condition;
+ s.v11.carDetails={gen:c.gen,year:c.year,engine:c.engine,body:c.name.includes("PRHT")?"PRHT":"Roadster",origin:"Gatbil",roadPrice:c.price,conversionCost:conv,km:c.km};
+ s.car.condition=c.condition;s.v11.upgrades={cooling:0,diff:0,brakes:0,suspension:0,data:0,weight:0};
+ let verdict=reveal>=perf.potential+2?"Det visade sig vara ett riktigt fynd – chassit känns bättre än väntat!":reveal<=perf.potential-2?"Vid bygget upptäckte ni mer slitage än väntat.":"Bilen motsvarade ungefär förväntningarna.";
+ s.log.unshift(`${verdict} ${c.year} ${c.gen} byggdes om till ${cls}.`);
+ save();alert(`${verdict}\n\nBilnivå: ${perf.level}\nPotential efter genomgång: ${reveal}`);garageV13();
+}
+
+// Fix ready-race purchases from the dynamic market lookup.
+const _buyCar16old=buyCar15;
+buyCar15=function(id){
+ let mk=marketCars16(),c=mk.race.find(x=>x.id===id);
+ if(!c)return _buyCar16old(id);
+ if(s.entered)return alert("Du kan inte byta bil mitt under en racehelg.");
+ let trade=s.v12.carPurchased?currentCarValue15():0,total=s.cash+(s.privateCash||0)+trade;
+ if(total<c.price)return alert("Du har inte råd ens om du säljer nuvarande bil.");
+ if(s.v12.carPurchased){if(!confirm(`Byta in nuvarande bil för cirka ${m(trade)} och köpa ${c.name}?`))return;s.cash+=trade}
+ let need=Math.max(0,c.price-s.cash);s.cash=Math.max(0,s.cash-c.price);s.privateCash=Math.max(0,(s.privateCash||0)-need);
+ s.cls=c.cls;s.v12.carPurchased=true;s.v11.carName=c.name;s.v11.purchasePrice=c.price;s.v11.carLevel=c.level;s.v11.carPotential=c.potential;s.v11.carCondition=c.condition;
+ s.v11.carDetails={gen:"NC",year:null,engine:"2.0",body:"Racebil",origin:"Färdig tävlingsbil",roadPrice:null,conversionCost:null,km:null};
+ s.car.condition=c.condition;s.v11.upgrades={cooling:0,diff:0,brakes:0,suspension:0,data:0,weight:0};save();garageV13();
+}
+
+// Show detailed identity of the car in the garage.
+const _garage16old=garageV13;
+garageV13=function(){
+ _garage16old();if(!s.v12?.carPurchased)return;
+ let d=s.v11.carDetails;if(!d)return;
+ let hero=main.querySelector(".hero");if(hero){
+   let p=hero.querySelector("p");
+   if(p)p.insertAdjacentHTML("afterend",`<p class="muted">${d.year?d.year+" • ":""}${d.gen||""}${d.engine?" • "+d.engine+" liter":""}${d.body?" • "+d.body:""}${d.origin?" • Ursprung: "+d.origin:""}${d.km?` • ${d.km.toLocaleString("sv-SE")} mil vid köp`:""}</p>`);
+ }
+}
+garage=garageV13;carMarket12=carMarket15;
+ensureV15();
+
+
+// ==================== v2.0 2D LIVE RACE ====================
+function ensureV17(){ensureV15();s.v17=s.v17||{}}
+const TRACKSHAPES17={
+"Anderstorp":[[.15,.25],[.42,.13],[.76,.16],[.88,.31],[.81,.53],[.91,.72],[.72,.86],[.42,.82],[.18,.68],[.10,.47]],
+"Rudskogen":[[.18,.18],[.48,.10],[.77,.18],[.88,.38],[.78,.56],[.88,.76],[.60,.88],[.31,.81],[.12,.61],[.22,.43]],
+"Ring Knutstorp":[[.17,.27],[.37,.12],[.67,.14],[.86,.27],[.77,.44],[.89,.62],[.72,.83],[.45,.76],[.25,.88],[.10,.62]],
+"Mantorp Park":[[.12,.22],[.55,.12],[.87,.19],[.82,.42],[.67,.52],[.88,.71],[.61,.86],[.29,.80],[.11,.61],[.23,.43]]
+};
+function trackName17(){let c=currentCal()[s.event];return c?c[0]:"Anderstorp"}
+function pathPoints17(w,h){
+ let sh=TRACKSHAPES17[trackName17()]||TRACKSHAPES17["Anderstorp"],pts=[];
+ for(let i=0;i<sh.length;i++){let a=sh[i],b=sh[(i+1)%sh.length];
+  for(let j=0;j<18;j++){let t=j/18,tt=t*t*(3-2*t);pts.push({x:(a[0]+(b[0]-a[0])*tt)*w,y:(a[1]+(b[1]-a[1])*tt)*h})}}
+ return pts;
+}
+let anim17=null,vis17={};
+function raceProgress17(x){
+ let active=[...live.field].filter(z=>!z.dnf).sort((a,b)=>a.total-b.total),leader=active[0];
+ if(!leader)return 0;
+ let leaderLaps=leader.laps||live.lap||0, laps=x.laps||live.lap||0, gap=Math.max(0,(x.total||0)-(leader.total||0));
+ let lapSec=92,back=(leaderLaps-laps)+gap/lapSec;
+ return ((leaderLaps-back)%1+1)%1;
+}
+function drawTrack17(){
+ let cv=document.getElementById("raceCanvas17");if(!cv||!live||live.finished)return;
+ let w=Math.max(680,cv.getBoundingClientRect().width),h=w*.52,dpr=Math.min(2,devicePixelRatio||1);
+ if(cv.width!==Math.floor(w*dpr)){cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+"px"}
+ let ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle="#101319";ctx.fillRect(0,0,w,h);
+ let pts=pathPoints17(w,h);
+ ctx.strokeStyle="#363c45";ctx.lineWidth=34;ctx.lineJoin="round";ctx.lineCap="round";ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.stroke();
+ ctx.strokeStyle="#7b8189";ctx.lineWidth=2;ctx.setLineDash([8,10]);ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.stroke();ctx.setLineDash([]);
+ let st=pts[0];ctx.strokeStyle="#fff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(st.x-10,st.y-15);ctx.lineTo(st.x+10,st.y+15);ctx.stroke();
+ let cars=live.field.filter(x=>!x.dnf);
+ cars.forEach((x,idx)=>{
+  let target=raceProgress17(x),key=x.cls+x.n;if(vis17[key]==null)vis17[key]=target;
+  let cur=vis17[key],d=target-cur;if(d>.5)d-=1;if(d<-.5)d+=1;cur=(cur+d*.09+1)%1;vis17[key]=cur;
+  let k=Math.floor(cur*(pts.length-1)),p=pts[k],q=pts[(k+2)%pts.length],ang=Math.atan2(q.y-p.y,q.x-p.x),off=((idx%3)-1)*5;
+  let xx=p.x-Math.sin(ang)*off,yy=p.y+Math.cos(ang)*off;
+  ctx.save();ctx.translate(xx,yy);ctx.rotate(ang);ctx.fillStyle=x.you?"#ff453a":x.cls==="Modified"?"#f2ad24":"#55a7ff";ctx.fillRect(-10,-5,20,10);ctx.strokeStyle=x.you?"#fff":"#111";ctx.lineWidth=x.you?2:1;ctx.strokeRect(-10,-5,20,10);ctx.restore();
+  if(x.you||idx<10){ctx.fillStyle="#fff";ctx.font=x.you?"bold 12px sans-serif":"10px sans-serif";ctx.textAlign="center";ctx.fillText(String(x.n),xx,yy-9)}
+ });
+ ctx.fillStyle="rgba(0,0,0,.7)";ctx.fillRect(12,12,225,63);ctx.textAlign="left";ctx.fillStyle="#fff";ctx.font="bold 14px sans-serif";ctx.fillText(trackName17()+" • 2D LIVE",24,34);
+ ctx.font="12px sans-serif";ctx.fillStyle="#ff453a";ctx.fillText("■ Du",24,55);ctx.fillStyle="#f2ad24";ctx.fillText("■ Modified",78,55);ctx.fillStyle="#55a7ff";ctx.fillText("■ Standard",158,55);
+ anim17=requestAnimationFrame(drawTrack17);
+}
+function timing17(){
+ let a=[...live.field].filter(x=>!x.dnf).sort((a,b)=>a.total-b.total),mi=a.findIndex(x=>x.you),lo=Math.max(0,mi-3),hi=Math.min(a.length,mi+4);
+ return a.slice(lo,hi).map((x,j)=>{let i=lo+j,prev=a[i-1],gap=prev?Math.max(0,x.total-prev.total):0;return `<div class="row"><span><b>P${i+1}</b> #${x.n} ${x.nm}</span><b>${x.you?"DU":i===0?"LED":`+${gap.toFixed(2)}`}</b></div>`}).join("");
+}
+function inject2D17(){
+ if(!live||live.finished)return;let hero=main.querySelector(".hero");if(!hero)return;
+ document.getElementById("trackWrap17")?.remove();
+ hero.insertAdjacentHTML("afterend",`<div id="trackWrap17" class="card" style="padding:8px;overflow:hidden"><canvas id="raceCanvas17" style="display:block;width:100%;border-radius:10px"></canvas><div class="grid" style="margin-top:8px"><div class="span7"><h3>Närmaste bilar</h3>${timing17()}</div><div class="span5"><h3>Livekarta</h3><p class="muted">Bilarna placeras utifrån den tidsbaserade racemotorn. När en lucka minskar ska du se bilarna krypa ihop.</p></div></div></div>`);
+ if(anim17)cancelAnimationFrame(anim17);setTimeout(drawTrack17,20);
+}
+const _lv17=liveViewV12;
+liveViewV12=function(){_lv17();inject2D17()}
+liveViewV11=liveViewV12;liveView=liveViewV12;
+const _ml17=makeLiveV11;
+makeLiveV11=function(risk){_ml17(risk);setTimeout(inject2D17,0)}
+startRace=makeLiveV11;makeLiveV5=makeLiveV11;
+ensureV17();
+
+
+// v2.0 Race 2.0
+const PASS18={"Anderstorp":.66,"Rudskogen":.53,"Ring Knutstorp":.40,"Mantorp Park":.73};
+function pass18(){return PASS18[trackName17()]||.52}
+function order18(){return [...live.field].filter(x=>!x.dnf).sort((a,b)=>a.total-b.total)}
+function sk18(x,k){return x.you?(s.v11.driverSkills?.[k]||70):(x.ai?.[k]||70)}
+function traffic18(){
+ let a=order18();
+ for(let i=1;i<a.length;i++){
+  let f=a[i-1],b=a[i],g=b.total-f.total;if(g>.85)continue;
+  let chance=.13+pass18()*.32+(sk18(b,"racecraft")-sk18(f,"racecraft"))*.006+(b.cls==="Modified"&&f.cls==="Standard"?.16:0);
+  if(Math.random()<chance){b.total=f.total-.08-Math.random()*.1;live.events.unshift(`↔️ #${b.n} ${b.nm} tar sig förbi #${f.n}.`)}
+  else b.total+=.05+Math.random()*.18;
+ }
+ sortTimeV11();
+}
+function errors18(){
+ live.field.forEach(x=>{
+  if(x.dnf)return;let c=sk18(x,"consistency");
+  if(Math.random()<.007+(100-c)*.00018){
+   let r=Math.random(),loss=r<.75?.3+Math.random()*1.2:r<.96?1.6+Math.random()*3.2:5+Math.random()*7;
+   x.total+=loss;live.events.unshift(`⚠️ #${x.n} ${x.nm} ${loss<1.5?"går brett":loss<5?"gör ett större misstag":"snurrar"} och tappar ${loss.toFixed(1)} s.`);
+  }
+ });sortTimeV11();
+}
+function sc18(){
+ if(live.sc18){if(--live.sc18<=0){live.sc18=0;live.events.unshift("🟢 Safety Car in – omstart!");}return}
+ if(Math.random()<.011){
+  live.sc18=2;let a=order18(),t=a[0].total;a.forEach((x,i)=>x.total=t+i*(.22+Math.random()*.1));
+  live.events.unshift("🟡 SAFETY CAR – fältet samlas ihop!");
+ }
+}
+function duel18(){
+ if(live.decision)return;
+ let a=order18(),i=a.findIndex(x=>x.you),me=a[i],f=a[i-1],b=a[i+1];
+ if(f&&me.total-f.total<.7&&Math.random()<.34)live.decision={type:"duel18",mode:"attack",target:f.n};
+ else if(b&&b.total-me.total<.6&&Math.random()<.27)live.decision={type:"duel18",mode:"defend",target:b.n};
+}
+function resolveDuel18(c){
+ let d=live.decision,t=live.field.find(x=>String(x.n)===String(d.target)),me=live.field.find(x=>x.you),p=.28+pass18()*.32+(sk18(me,"racecraft")-sk18(t,"racecraft"))*.006;
+ if(d.mode==="attack"){
+  if(c==="prepare"){me.total+=.03;live.attackPrep18=.12;live.events.unshift(`🎯 Du förbereder attacken på #${t.n}.`)}
+  if(c==="go"){if(Math.random()<p+(live.attackPrep18||0)){me.total=t.total-.11;live.events.unshift(`🔥 Du tar dig förbi #${t.n} ${t.nm}!`)}else{me.total+=.25;live.events.unshift(`↩️ #${t.n} håller dig bakom.`)}live.attackPrep18=0}
+  if(c==="wait"){me.total+=.06;live.events.unshift("🧠 Du avvaktar och sparar bilen.")}
+ }else{
+  if(c==="smart"){if(Math.random()<.58+(sk18(me,"racecraft")-sk18(t,"racecraft"))*.006)t.total+=.2;else t.total=me.total-.09}
+  if(c==="hard"){if(Math.random()<.68){t.total+=.28;me.total+=.06}else me.total+=.48;live.events.unshift("🚪 Du försvarar hårt.")}
+  if(c==="pace"){if(Math.random()<.45)t.total+=.1;else t.total=me.total-.08}
+ }
+ live.decision=null;sortTimeV11();save();liveViewV12();
+}
+function duelView18(){
+ let d=live?.decision;if(!d||d.type!=="duel18")return"";let t=live.field.find(x=>String(x.n)===String(d.target));
+ return d.mode==="attack"?`<div class="decision"><h2>⚔️ DUELL MED #${t.n} ${t.nm}</h2><p>Du ligger inom attackavstånd. På ${trackName17()} är det ${pass18()>.62?"relativt lätt":pass18()>.47?"medelsvårt":"svårt"} att köra om.</p><div class="controls"><button class="btn good" onclick="resolveDuel18('prepare')">Bygg upp attacken</button><button class="btn primary" onclick="resolveDuel18('go')">Gå förbi nu</button><button class="btn" onclick="resolveDuel18('wait')">Avvakta</button></div></div>`:`<div class="decision"><h2>🛡️ #${t.n} ${t.nm} ATTACKERAR</h2><p>Han ligger tätt bakom.</p><div class="controls"><button class="btn good" onclick="resolveDuel18('smart')">Försvara smart</button><button class="btn primary" onclick="resolveDuel18('hard')">Stäng dörren</button><button class="btn" onclick="resolveDuel18('pace')">Kör ditt tempo</button></div></div>`;
+}
+function start18(){
+ if(live.started18)return;live.started18=1;let me=live.field.find(x=>x.you),r=Math.random(),d=r<.1?.32:r>.9?-.25:(Math.random()-.5)*.14;me.total+=d;
+ live.events.unshift(`🚦 ${d>.2?"Trög start – du tappar några billängder.":d<-.17?"Kanonstart! Du är direkt på attack.":"Stabil start utan dramatik."}`);sortTimeV11();
+}
+const ADV18=advanceV11;
+advanceV11=function(n=1){
+ if(live?.decision)return liveViewV12();start18();ADV18(n);if(!live||live.finished)return;
+ for(let i=0;i<n;i++){sc18();if(!live.sc18){errors18();traffic18()}}duel18();save();liveViewV12();
+}
+const VIEW18=liveViewV12;
+liveViewV12=function(){
+ VIEW18();if(!live||live.finished)return;
+ let me=live.field.find(x=>x.you),a=order18(),i=a.indexOf(me),gf=i>0?me.total-a[i-1].total:99,gb=i<a.length-1?a[i+1].total-me.total:99;
+ let w=document.getElementById("trackWrap17");if(w)w.insertAdjacentHTML("beforeend",`<div class="card" style="margin-top:8px"><h3>Racebild</h3><div class="row"><span>Gap framåt</span><b>${gf<20?gf.toFixed(2)+" s":"—"}</b></div><div class="row"><span>Gap bakåt</span><b>${gb<20?gb.toFixed(2)+" s":"—"}</b></div><div class="row"><span>Omkörning på banan</span><b>${pass18()>.62?"Bra":pass18()>.47?"Medel":"Svår"}</b></div>${live.sc18?'<div class="row"><span>Race Control</span><b>🟡 SAFETY CAR</b></div>':""}</div>`);
+ if(live.decision?.type==="duel18")main.querySelector(".hero")?.insertAdjacentHTML("afterend",duelView18());
+}
+liveViewV11=liveViewV12;liveView=liveViewV12;
+
+
+// ==================== v2.0 TEAM, WORKSHOP, PADDOCK & CAREER LIFE ====================
+function ensureV19(){
+ ensureV18();s.v19=s.v19||{};
+ s.v19.facilities=s.v19.facilities||{garage:0,storage:0,transport:0};
+ s.v19.contacts=s.v19.contacts||{mechanic:0,parts:0,sponsor:0};
+ s.v19.reputation=s.v19.reputation||{paddock:0,local:0};
+ s.v19.goals=s.v19.goals||[];
+ s.v19.story=s.v19.story||[];
+ s.v19.teamName=s.v19.teamName||s.team||"Jakob Racing";
+}
+const FAC19=[
+ ["garage","Garageplats", [0,14000,32000,65000], ["Hemma på uppfarten","Enkel hyrd garageplats","Bra verkstad med lyft","Egen liten raceverkstad"]],
+ ["storage","Reservdelslager",[0,9000,22000,48000],["Det som ryms i bilen","Hylla med vanliga slitdelar","Bra lager av begagnade delar","Välfyllt tävlingslager"]],
+ ["transport","Transport",[0,18000,62000,120000],["Lånad/sliten lösning","Egen trailer","Skåpbil + trailer","Racebuss + bra trailer"]]
+];
+function facilityUpgrade19(k){
+ ensureV19();let f=FAC19.find(x=>x[0]===k),lv=s.v19.facilities[k];if(lv>=3)return;
+ let cost=f[2][lv+1];if(s.cash<cost)return alert("Racingbudgeten räcker inte.");
+ if(!confirm(`Uppgradera ${f[1]} till "${f[3][lv+1]}" för ${m(cost)}?`))return;
+ s.cash-=cost;s.stats.costs+=cost;s.v19.facilities[k]++;s.log.unshift(`${f[1]}: ${f[3][lv+1]}.`);save();teamHub19();
+}
+function teamHub19(){
+ ensureV19();let f=s.v19.facilities;
+ main.innerHTML=`<section class="hero"><span class="badge red">TEAMET</span><h1>${s.v19.teamName}</h1><p>Det här är basen runt bilen: verkstad, transport, reservdelar, kontakter och rykte.</p></section>
+ <div class="grid">
+ ${FAC19.map(x=>{let lv=f[x[0]];return `<div class="card span4"><h2>${x[1]}</h2><div class="big">${lv}/3</div><p><b>${x[3][lv]}</b></p><p class="muted">${x[0]==="garage"?"Bättre verkstad förbättrar bilprojekt och reparationer.":x[0]==="storage"?"Reservdelar ökar chansen att rädda en racehelg.":"Bättre transport minskar strul och ger bättre arbetsmiljö."}</p>${lv<3?`<button class="btn good" onclick="facilityUpgrade19('${x[0]}')">Uppgradera • ${m(x[2][lv+1])}</button>`:"<b>Maxnivå</b>"}</div>`}).join("")}
+ <div class="card span6"><h2>Kontakter</h2><div class="row"><span>Mekaniker</span><b>${s.v19.contacts.mechanic}/5</b></div><div class="row"><span>Reservdelskontakter</span><b>${s.v19.contacts.parts}/5</b></div><div class="row"><span>Sponsorkontakter</span><b>${s.v19.contacts.sponsor}/5</b></div><p class="muted">Kontakter byggs genom klubbkvällar, relationer och händelser. De kan rädda både pengar och racehelger.</p></div>
+ <div class="card span6"><h2>Rykte</h2><div class="row"><span>I depån</span><b>${Math.round(s.v19.reputation.paddock)}</b></div><div class="row"><span>Lokalt</span><b>${Math.round(s.v19.reputation.local)}</b></div><p class="muted">Hjälpsamhet bygger depårykte. Resultat och sponsorarbete bygger lokalt rykte.</p></div>
+ <div class="card span12"><h2>Karriärhistorik</h2>${s.v19.story.length?s.v19.story.slice(0,8).map(x=>`<div class="row"><span>${x}</span></div>`).join(""):"<p class='muted'>Din historia har precis börjat.</p>"}</div></div>`;
+}
+function goals19(){
+ ensureV19();
+ if(!s.v19.goals.length){
+  s.v19.goals=[
+   {id:"finish",name:"Ta bilen i mål i tre race",target:3,value:Math.min(3,s.stats.starts||0),reward:4500,done:false},
+   {id:"friend",name:"Bygg en relation till 30+",target:30,value:Math.max(0,...Object.values(s.v13.relations||{})),reward:3000,done:false},
+   {id:"car",name:"Nå bilnivå 70",target:70,value:carLevel12(),reward:5000,done:false}
+  ];
+ }
+ main.innerHTML=`<section class="hero"><span class="badge red">SÄSONGSMÅL</span><h1>Något att jaga även utanför pokalerna</h1><p>Små mål ger pengar, rykte och en känsla av progression även när du slåss om P10.</p></section><div class="grid">${s.v19.goals.map(g=>`<div class="card span4"><h2>${g.name}</h2><div class="big">${Math.min(g.target,Math.round(g.value))}/${g.target}</div>${bar(Math.min(100,g.value/g.target*100))}<p>Belöning: <b>${m(g.reward)}</b></p>${g.done?"<b>✓ Klar</b>":g.value>=g.target?`<button class="btn good" onclick="claimGoal19('${g.id}')">Hämta belöning</button>`:""}</div>`).join("")}</div>`;
+}
+function refreshGoals19(){
+ ensureV19();if(!s.v19.goals.length)return;
+ s.v19.goals.forEach(g=>{
+  if(g.id==="finish")g.value=Math.min(g.target,s.stats.starts||0);
+  if(g.id==="friend")g.value=Math.max(0,...Object.values(s.v13.relations||{}));
+  if(g.id==="car")g.value=carLevel12();
+ });
+}
+function claimGoal19(id){
+ refreshGoals19();let g=s.v19.goals.find(x=>x.id===id);if(!g||g.done||g.value<g.target)return;
+ g.done=true;s.cash+=g.reward;s.v14.income.other+=g.reward;s.v19.reputation.local+=2;s.v19.story.unshift(`${s.season}: Klarade målet "${g.name}".`);
+ save();goals19();
+}
+
+// Deeper off-track events
+const LIFE_EVENTS19=[
+ {title:"Begagnade delar på Marketplace",text:"En annan klubbåkare säljer ett parti reservdelar billigt.",choices:[["Köp paketet",-3500,"parts"],["Tipsa en vän",0,"friend"],["Avstå",0,"none"]]},
+ {title:"Lokala bilfirman hör av sig",text:"De har sett bilen och erbjuder ett litet samarbete om du visar upp den en lördag.",choices:[["Ställ ut bilen",3500,"sponsor"],["Be om delar istället",0,"parts"],["Tacka nej",0,"none"]]},
+ {title:"En ny förare behöver hjälp",text:"En nykomling i din klass frågar om råd inför sin första helg.",choices:[["Hjälp ordentligt",0,"rep"],["Ge några snabba tips",0,"smallrep"],["Du har inte tid",0,"none"]]},
+ {title:"Kvällsjobb i verkstad",text:"Du får möjlighet till ett betalt kvällspass hos en lokal verkstad.",choices:[["Ta jobbet",4200,"mechanic"],["Skruva på racebilen istället",-900,"car"],["Ta en ledig kväll",0,"rest"]]}
+];
+function lifeEvent19(){
+ ensureV19();let e=LIFE_EVENTS19[Math.floor(Math.random()*LIFE_EVENTS19.length)];s.v19.pending=e;lifeEventView19();
+}
+function lifeEventView19(){
+ let e=s.v19.pending;if(!e)return lifeBetween15();
+ main.innerHTML=`<section class="hero"><span class="badge red">HÄNDELSE</span><h1>${e.title}</h1><p>${e.text}</p></section><div class="card"><div class="choice">${e.choices.map((c,i)=>`<button onclick="resolveLife19(${i})"><strong>${c[0]}</strong>${c[1]?`<small>${c[1]>0?"+":""}${m(c[1])}</small>`:""}</button>`).join("")}</div></div>`;
+}
+function resolveLife19(i){
+ let e=s.v19.pending,c=e.choices[i],money=c[1],tag=c[2];if(money<0&&s.cash<Math.abs(money))return alert("Du har inte råd.");
+ s.cash+=money;if(money>0)s.v14.income.other+=money;else s.stats.costs+=Math.abs(money);
+ if(tag==="parts"){s.v19.contacts.parts=Math.min(5,s.v19.contacts.parts+1);s.v19.facilities.storage=Math.min(3,s.v19.facilities.storage+(.25))}
+ if(tag==="sponsor"){s.v19.contacts.sponsor=Math.min(5,s.v19.contacts.sponsor+1);s.v19.reputation.local+=2}
+ if(tag==="mechanic"){s.v19.contacts.mechanic=Math.min(5,s.v19.contacts.mechanic+1);s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+.5)}
+ if(tag==="rep"){s.v19.reputation.paddock+=3}
+ if(tag==="smallrep"){s.v19.reputation.paddock+=1}
+ if(tag==="car"){s.v11.tech.mechanics=Math.min(100,s.v11.tech.mechanics+.4);s.v11.carCondition=Math.min(100,(s.v11.carCondition||80)+2)}
+ s.v19.story.unshift(`${s.season}: ${e.title} – ${c[0]}.`);s.v19.pending=null;save();lifeBetween15();
+}
+
+// Upgrade problem-solving using facilities/contacts.
+const SOLVE19=solveIssue13;
+solveIssue13=function(how){
+ ensureV19();let q=s.v13.activeIssue;if(!q)return;
+ if(how==="self"){
+  let bonus=s.v19.facilities.garage*7+s.v19.facilities.storage*4+s.v19.contacts.mechanic*3;
+  if(Math.random()*100<bonus){s.v13.activeIssue=null;s.log.unshift(`Din verkstad/erfarenhet gjorde att du snabbt löste ${q.name}.`);save();alert("Din uppbyggda verkstad och dina kontakter gör skillnad – problemet löstes.");return practiceV12()}
+ }
+ if(how==="pay"&&s.v19.contacts.parts>0)q.cost=Math.round(q.cost*(1-Math.min(.25,s.v19.contacts.parts*.05)));
+ return SOLVE19(how);
+}
+
+// Enrich "life between races" with hub, goals and random event.
+const LIFE19=lifeBetween15;
+lifeBetween15=function(){
+ ensureV19();LIFE19();
+ let hero=main.querySelector(".hero"),c=hero?.querySelector(".controls");
+ if(!c){hero?.insertAdjacentHTML("beforeend",`<div class="controls"><button class="btn" onclick="teamHub19()">Team & verkstad</button><button class="btn" onclick="goals19()">Säsongsmål</button><button class="btn primary" onclick="lifeEvent19()">Vad händer den här veckan?</button></div>`)}
+ else c.insertAdjacentHTML("beforeend",`<button class="btn" onclick="teamHub19()">Team & verkstad</button><button class="btn" onclick="goals19()">Säsongsmål</button><button class="btn primary" onclick="lifeEvent19()">Veckohändelse</button>`);
+}
+const GAR19=garageV13;
+garageV13=function(){
+ ensureV19();GAR19();if(!s.v12?.carPurchased)return;
+ let hero=main.querySelector(".hero"),c=hero?.querySelector(".controls");
+ if(c)c.insertAdjacentHTML("beforeend",`<button class="btn" onclick="teamHub19()">Teamet</button><button class="btn" onclick="goals19()">Mål</button>`);
+}
+garage=garageV13;
+
+// Club activity now grows useful contacts/reputation.
+const LA19=lifeAction15;
+lifeAction15=function(type){
+ LA19(type);ensureV19();
+ if(type==="club"){s.v19.reputation.paddock+=2;if(Math.random()<.45)s.v19.contacts.parts=Math.min(5,s.v19.contacts.parts+1)}
+ if(type==="help")s.v19.reputation.paddock+=2;
+ if(type==="work"&&Math.random()<.35)s.v19.contacts.mechanic=Math.min(5,s.v19.contacts.mechanic+1);
+ refreshGoals19();save();
+}
+ensureV19();
+
+
+// ==================== v2.0 LIVING PADDOCK ====================
+function ensureV20(){
+ ensureV19();s.v20=s.v20||{};
+ s.v20.people=s.v20.people||{};
+ s.v20.news=s.v20.news||[];
+ s.v20.favors=s.v20.favors||{};
+ s.v20.memories=s.v20.memories||{};
+ s.v20.weekendSocialDone=s.v20.weekendSocialDone||{};
+}
+function person20(name){
+ ensureV20();
+ if(!s.v20.people[name])s.v20.people[name]={respect:0,trust:0,rivalry:0,helped:0,helpedYou:0,sharedGarage:0};
+ return s.v20.people[name];
+}
+function rel20(name){return s.v13?.relations?.[name]||0}
+function cls20(name){
+ let d=ALL_DRIVERS.find(x=>x.nm===name);return d?.cls||"?";
+}
+function driverByName20(name){return ALL_DRIVERS.find(x=>x.nm===name)}
+function sameClassDrivers20(){
+ return ALL_DRIVERS.filter(x=>x.cls===s.cls&&x.nm!==s.name);
+}
+function addNews20(text,kind="depå"){
+ ensureV20();s.v20.news.unshift({season:s.season,event:s.event,text,kind});s.v20.news=s.v20.news.slice(0,60);
+}
+function socialPool20(){
+ let same=sameClassDrivers20(),all=ALL_DRIVERS.filter(x=>x.nm!==s.name);
+ return Math.random()<.84&&same.length?same:all;
+}
+function pickPerson20(){let a=socialPool20();return a[Math.floor(Math.random()*a.length)]}
+const PADDOCK20=[
+ {id:"garage",title:"Kväll i garaget",text:n=>`${n} skickar ett meddelande. Bilen står halvfärdig och det vore trevligare att skruva tillsammans.`,choices:[
+  ["Åk dit och hjälp till","help"],["Ta med pizza och häng en stund","hang"],["Du måste fixa din egen bil","own"]]},
+ {id:"setup",title:"Data över en kaffe",text:n=>`${n} undrar om du vill jämföra data och snacka spårval inför nästa pass.`,choices:[
+  ["Dela allt du har","data"],["Byt några användbara tips","tips"],["Behåll datan för dig själv","secret"]]},
+ {id:"part",title:"En låda med delar",text:n=>`${n} har några begagnade MX-5-delar över och tror att något kan passa din bil.`,choices:[
+  ["Köp lådan billigt","buy"],["Byt mot hjälp i garaget","trade"],["Tacka nej","none"]]},
+ {id:"tow",title:"Transportstrul",text:n=>`${n} har problem med transporten till nästa tävling och frågar om du kan hjälpa till.`,choices:[
+  ["Lös det tillsammans","tow"],["Försök hitta någon annan som kan hjälpa","contact"],["Tyvärr, fullt","none"]]},
+ {id:"rival",title:"Det skaver lite",text:n=>`${n} tycker att du körde onödigt hårt senast ni låg nära varandra.`,choices:[
+  ["Snacka ut ordentligt","apology"],["Stå på dig","stand"],["Skämta bort det","joke"]]}
+];
+function paddockEvent20(forceId){
+ ensureV20();let d=pickPerson20();if(!d)return;
+ let pool=PADDOCK20.filter(e=>!forceId||e.id===forceId);
+ let e=pool[Math.floor(Math.random()*pool.length)];
+ s.v20.pending={event:e.id,name:d.nm};paddockEventView20();
+}
+function paddockEventView20(){
+ let p=s.v20.pending;if(!p)return paddockWorld20();
+ let e=PADDOCK20.find(x=>x.id===p.event),name=p.name;
+ main.innerHTML=`<section class="hero"><span class="badge red">DEPÅLIV</span><h1>${e.title}</h1><p>${e.text(name)}</p><div class="chips"><span class="chip">${name}</span><span class="chip">${cls20(name)}</span><span class="chip">Relation ${rel20(name)}</span></div></section><div class="card"><div class="choice">${e.choices.map((c,i)=>`<button onclick="resolvePaddock20(${i})"><strong>${c[0]}</strong></button>`).join("")}</div></div>`;
+}
+function resolvePaddock20(i){
+ let q=s.v20.pending,e=PADDOCK20.find(x=>x.id===q.event),c=e.choices[i][1],n=q.name,p=person20(n);
+ let rel=s.v13.relations||(s.v13.relations={});let delta=0,story="";
+ if(c==="help"){delta=9;p.trust+=3;p.helped++;s.v19.reputation.paddock+=2;story=`Du hjälpte ${n} i garaget.`}
+ if(c==="hang"){delta=6;p.trust+=2;p.sharedGarage++;story=`Du och ${n} hade en avslappnad garagekväll.`}
+ if(c==="own"){delta=-1;story=`Du prioriterade din egen bil framför garagekvällen med ${n}.`}
+ if(c==="data"){delta=8;p.trust+=3;s.v11.driverSkills.consistency=Math.min(100,(s.v11.driverSkills.consistency||70)+.25);story=`Du och ${n} delade data öppet.`}
+ if(c==="tips"){delta=4;p.trust+=1;story=`Du bytte några tips med ${n}.`}
+ if(c==="secret"){delta=-3;p.rivalry+=1;story=`Du höll din data för dig själv när ${n} frågade.`}
+ if(c==="buy"){if(s.cash<2200)return alert("Du har inte råd.");s.cash-=2200;s.stats.costs+=2200;delta=3;s.v19.contacts.parts=Math.min(5,s.v19.contacts.parts+1);story=`Du köpte en låda begagnade delar av ${n}.`}
+ if(c==="trade"){delta=7;p.trust+=2;s.v19.contacts.parts=Math.min(5,s.v19.contacts.parts+1);story=`Du bytte garagetid mot delar med ${n}.`}
+ if(c==="tow"){delta=10;p.trust+=4;p.helped++;s.v19.reputation.paddock+=3;story=`Du hjälpte ${n} lösa transporten till tävlingen.`}
+ if(c==="contact"){delta=4;s.v19.contacts.parts=Math.min(5,s.v19.contacts.parts+1);story=`Du ordnade en kontakt som hjälpte ${n} med transporten.`}
+ if(c==="none"){delta=-2;story=`Du kunde inte hjälpa ${n} den här gången.`}
+ if(c==="apology"){delta=8;p.rivalry=Math.max(0,p.rivalry-3);p.respect+=2;story=`Du och ${n} snackade ut efter ert race.`}
+ if(c==="stand"){delta=-5;p.rivalry+=4;p.respect+=1;story=`Du stod på dig i diskussionen med ${n}. Rivaliteten ökade.`}
+ if(c==="joke"){delta=2;if(Math.random()<.55){delta+=4;p.rivalry=Math.max(0,p.rivalry-1)}else p.rivalry+=1;story=`Du försökte skämta bort situationen med ${n}.`}
+ rel[n]=(rel[n]||0)+delta;p.respect+=Math.max(0,delta*.25);
+ s.v19.story.unshift(`${s.season}: ${story}`);addNews20(story);
+ s.v20.pending=null;refreshGoals19();save();paddockWorld20();
+}
+function relationLabel20(n){
+ let r=rel20(n),p=person20(n);
+ if(p.rivalry>=6)return "Rival";
+ if(r>=55)return "Nära vän";
+ if(r>=30)return "Bra relation";
+ if(r>=10)return "Bekant";
+ if(r<=-20)return "Spänd";
+ return "Neutral";
+}
+function paddockWorld20(){
+ ensureV20();let ds=[...ALL_DRIVERS].filter(x=>x.nm!==s.name).sort((a,b)=>{
+  let ac=a.cls===s.cls?1:0,bc=b.cls===s.cls?1:0;if(ac!==bc)return bc-ac;return rel20(b.nm)-rel20(a.nm)
+ });
+ main.innerHTML=`<section class="hero"><span class="badge red">PADDOCKEN</span><h1>Människorna runt racingen</h1><p>Relationer växer genom gemensamma helger, hjälp, konflikter och garagekvällar. Förare i din egen klass står i centrum.</p><div class="controls"><button class="btn primary" onclick="paddockEvent20()">Ny depåhändelse</button><button class="btn" onclick="paddockNews20()">Depånyheter</button></div></section>
+ <div class="grid">${ds.slice(0,18).map(d=>{let p=person20(d.nm),r=rel20(d.nm);return `<div class="card span4"><div class="row"><span><b>#${d.n} ${d.nm}</b><br><small>${d.cls}</small></span><span class="badge ${p.rivalry>=6?"red":""}">${relationLabel20(d.nm)}</span></div><div class="row"><span>Relation</span><b>${r>0?"+":""}${r}</b></div><div class="row"><span>Förtroende</span><b>${p.trust}</b></div><div class="row"><span>Respekt</span><b>${Math.round(p.respect)}</b></div>${p.rivalry?`<div class="row"><span>Rivalitet</span><b>${p.rivalry}</b></div>`:""}</div>`}).join("")}</div>`;
+}
+function paddockNews20(){
+ ensureV20();
+ main.innerHTML=`<section class="hero"><span class="badge red">DEPÅNYHETER</span><h1>Vad det snackas om</h1><p>Små händelser från din egen karriär och människorna runt den.</p></section><div class="card">${s.v20.news.length?s.v20.news.map(n=>`<div class="row"><span>${n.text}</span><small>${n.season}</small></div>`).join(""):"<p class='muted'>Det är ovanligt tyst i depån just nu.</p>"}</div>`;
+}
+
+// Race incidents can now leave a social memory.
+function postRaceMemory20(){
+ ensureV20();if(!live)return;
+ let a=[...live.field].filter(x=>!x.dnf).sort((a,b)=>a.total-b.total),i=a.findIndex(x=>x.you);
+ let near=[a[i-1],a[i+1]].filter(Boolean).filter(x=>!x.you);
+ if(!near.length)return;
+ let x=near[Math.floor(Math.random()*near.length)],p=person20(x.nm);
+ if(Math.random()<.22){
+   p.respect+=1;s.v13.relations[x.nm]=(s.v13.relations[x.nm]||0)+2;
+   let t=`Efter racet pratar du och ${x.nm} om er täta kamp. Respekten mellan er ökar.`;
+   addNews20(t);s.v19.story.unshift(`${s.season}: ${t}`);
+ }
+}
+const FIN20=finishRaceV11;
+finishRaceV11=function(){postRaceMemory20();return FIN20()}
+
+// AI paddock life between events: small, fictional gameplay stories only.
+function aiWorldTick20(){
+ ensureV20();let a=ALL_DRIVERS.filter(x=>x.nm!==s.name);if(a.length<2)return;
+ for(let k=0;k<2;k++){
+  let x=a[Math.floor(Math.random()*a.length)],y=a[Math.floor(Math.random()*a.length)];if(x===y)continue;
+  let r=Math.random(),txt;
+  if(r<.35)txt=`${x.nm} och ${y.nm} syns skruva tillsammans sent i depån.`;
+  else if(r<.7)txt=`${x.nm} lånar ut delar till ${y.nm} inför nästa körpass.`;
+  else txt=`Det snackas om att ${x.nm} funderar på hur nästa steg i racingkarriären ska se ut.`;
+  addNews20(txt,"världen");
+ }
+}
+const FE20=finishEvent;
+finishEvent=function(){aiWorldTick20();return FE20()}
+
+// Make rivalry matter slightly in v1.8 duels, without turning it into arcade aggression.
+const RES20=resolveDuel18;
+resolveDuel18=function(c){
+ let d=live?.decision,t=d?live.field.find(x=>String(x.n)===String(d.target)):null;
+ if(t&&!t.you&&person20(t.nm).rivalry>=6&&c==="hard")person20(t.nm).respect+=.5;
+ return RES20(c);
+}
+
+// Add access from team/life/garage surfaces.
+const TEAM20=teamHub19;
+teamHub19=function(){TEAM20();main.querySelector(".hero")?.insertAdjacentHTML("beforeend",`<div class="controls"><button class="btn primary" onclick="paddockWorld20()">Paddocken</button><button class="btn" onclick="paddockNews20()">Depånyheter</button></div>`)}
+const LIFE20=lifeBetween15;
+lifeBetween15=function(){LIFE20();let h=main.querySelector(".hero .controls");if(h)h.insertAdjacentHTML("beforeend",`<button class="btn" onclick="paddockWorld20()">Paddocken</button>`)}
+const GAR20=garageV13;
+garageV13=function(){GAR20();let h=main.querySelector(".hero .controls");if(h)h.insertAdjacentHTML("beforeend",`<button class="btn" onclick="paddockWorld20()">Paddocken</button>`)}
+garage=garageV13;
+ensureV20();
 
 render();
 </script></body></html>
